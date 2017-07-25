@@ -38,12 +38,12 @@
 
     <!--选择会员卡-->
     <!--<Modal title="选择会员卡" width="200" v-model="memberCardModal" :closeable="false" :mask-closable="false">-->
-      <!--<Select v-model="memberCard" placeholder="请选择">-->
-        <!--<Option :value="item.id" :key="item.id" v-for="item in memberCardList">{{item.typeName}}-{{item.money}}</Option>-->
-      <!--</Select>-->
-      <!--<div slot="footer">-->
-        <!--<Button type="primary" @click="bindMemberCard">确定</Button>-->
-      <!--</div>-->
+    <!--<Select v-model="memberCard" placeholder="请选择">-->
+    <!--<Option :value="item.id" :key="item.id" v-for="item in memberCardList">{{item.typeName}}-{{item.money}}</Option>-->
+    <!--</Select>-->
+    <!--<div slot="footer">-->
+    <!--<Button type="primary" @click="bindMemberCard">确定</Button>-->
+    <!--</div>-->
     <!--</Modal>-->
 
 
@@ -191,7 +191,7 @@
       <div slot="footer">
         <Row>
           <Col span="8" offset="8">
-          <Button type="primary" long @click="submitValidate('memberForm')">确定</Button>
+          <Button type="primary" long @click="submitValidate('modifyMember')">确定</Button>
           </Col>
         </Row>
 
@@ -201,59 +201,59 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return {
-        memberList:[],
-        page:{
-          pageNo:1,
-          pageSize:10,
-          total:0
-        },
-        key:'',
-        memberCardModal:false,
-        memberCard:'',
-        memberCardList:[],
-        member:{},
-        memberInfoModal:false,
-        ruleValidate:{
-        },
-        open:false,
-        stadiumList:[],
-        memberValidate:{
+    export default {
+        data () {
+            return {
+                memberList:[],
+                page:{
+                    pageNo:1,
+                    pageSize:10,
+                    total:0
+                },
+                key:'',
+                memberCardModal:false,
+                memberCard:'',
+                memberCardList:[],
+                member:{},
+                memberInfoModal:false,
+                ruleValidate:{
+                },
+                open:false,
+                stadiumList:[],
+                memberValidate:{
 
-        },
-        modifyModal:false,
-        modifyMember:{
-        },
-        modifyValidate: {
-          name:[{required:true,message:'请输入姓名',trigger:'blur'}],
-          phone:[{required:true,message:'请输入手机号',trigger:'blur'}],
-          tel:[{required:true,message:'请输入联系电话',trigger:'blur'}],
-          status:[{required:true,message:'请选择状态',trigger:'change'}],
-          stadiumId:[{required:true,message:'请选择场馆',trigger:'change'},{type:'number'}],
-          identityCard:[{required:true,message:'请输入证件号码',trigger:'blur'}],
+                },
+                modifyModal:false,
+                modifyMember:{
+                },
+                modifyValidate: {
+                    name:[{required:true,message:'请输入姓名',trigger:'blur'}],
+                    phone:[{required:true,message:'请输入手机号',trigger:'blur'}],
+                    tel:[{required:true,message:'请输入联系电话',trigger:'blur'}],
+                    status:[{required:true,message:'请选择状态',trigger:'change'}],
+                    stadiumId:[{type:'number',required:true,message:'请选择场馆',trigger:'change'}],
+                    identityCard:[{required:true,message:'请输入证件号码',trigger:'blur'}],
 //          memberCardId:[{required:true,message:'请选择会员卡',trigger:'change'}],
-          sex:[{required:true,message:'请选择性别',trigger:'change'}]
+                    sex:[{required:true,message:'请选择性别',trigger:'change'}]
+                },
+            }
         },
-      }
-    },
-    methods:{
-      //分页方法
-      pageListHandler(){
-        this.$http.get('/member/list?pageNo='+this.page.pageNo+"&pageSize="+this.page.pageSize+"&key="+this.key).then(res=>{
-          console.log(res.data)
-          this.memberList=res.data
-          this.page.total=res.total
-          this.page.pageNo=res.pageNo
-        })
-      },
-      //页码改变事件
-      pageChangeHandler(event){
-        this.page.pageNo=event
-        this.pageListHandler()
-      },
-      //打开选择会员卡模态
+        methods:{
+            //分页方法
+            pageListHandler(){
+                this.$http.get('/member/list?pageNo='+this.page.pageNo+"&pageSize="+this.page.pageSize+"&key="+this.key).then(res=>{
+                    console.log(res.data)
+                    this.memberList=res.data
+                    this.page.total=res.total
+                    this.page.pageNo=res.pageNo
+                })
+            },
+            //页码改变事件
+            pageChangeHandler(event){
+                this.page.pageNo=event
+                this.pageListHandler()
+            },
+            //打开选择会员卡模态
 //      selectMemberCard(param){
 //        this.member=param.row
 //        this.$http.get('/memberCard/cardList?stadiumId='+param.row.stadiumId).then(res=>{
@@ -261,7 +261,7 @@
 //        })
 //        this.memberCardModal=true
 //      },
-      //绑定会员卡
+            //绑定会员卡
 //      bindMemberCard(){
 //        console.log(this.member)
 //        if(!this.memberCard){
@@ -278,128 +278,143 @@
 //          }
 //        })
 //      },
-      //跳转登录页面
-      toRegister(){
-        this.$router.push('register')
-      },
-      //注销会员打开prompt
-      cancelHandler(param){
-        this.member=param
-        this.open=true
-      },
-      //确认注销操作
-      cancelMemberOkHandler(){
-        this.$http.post('/member/cancel?id='+this.member.id).then(res=>{
-          if(res.result==1){
-            this.$Message.success('注销会员成功')
-            this.pageListHandler()
-          }else{
-            this.$Message.error('注销会员失败')
-          }
-        })
-      },
-      //修改提交先进行校验操作
-      submitValidate(val){
+            //跳转登录页面
+            toRegister(){
+                this.$router.push('register')
+            },
+            //注销会员打开prompt
+            cancelHandler(param){
+                this.member=param
+                this.open=true
+            },
+            //确认注销操作
+            cancelMemberOkHandler(){
+                this.$http.post('/member/cancel?id='+this.member.id).then(res=>{
+                    if(res.result==1){
+                        this.$Message.success('注销会员成功')
+                        this.pageListHandler()
+                    }else{
+                        this.$Message.error('注销会员失败')
+                    }
+                })
+            },
+            //修改提交先进行校验操作
+            submitValidate(val){
+                let self =this;
+                self.$refs[val].validate(function(valid){
+                    if(valid){
+                        self.$http.post('/member/update',JSON.stringify(self.modifyMember)).then(function(res){
+                            if(res.result){
+                                self.$Message.success('修改成功')
+                                self.pageListHandler()
+                                this.modifyModal=!this.modifyModal;
+                            }else {
+                                self.$Message.error(res.error.message)
+                            }
+                        })
+                    }else{
+                        self.$Message.error('请将表单填写完整')
+                    }
+                })
+            },
+            //修改按钮操作  打开修改模态 赋值 查询场馆列表
+            toModifyMember(param){
+                this.memberInfoHandler(param.row.id)
+                console.log('修改打印')
+                console.log(param)
+                this.stadiumListHandler()
+                this.modifyModal=true
+            },
+            //选择场馆事件 调用查询会员卡事件
+            stadiumChangeHandler(){
+                this.memberCardListHandler()
+            },
+            //根据场馆id查询会员卡
+            memberCardListHandler(){
+                this.$http.get('/memberCard/cardList?stadiumId='+this.modifyMember.stadiumId).then(res=>{
+                    this.memberCardList=res.data
+                })
+            },
+            //查询场馆列表
+            stadiumListHandler(){
+                this.$http.get('/stadium/allStadium').then(res=> {
+                    this.stadiumList = res.data
+                })
+            },
+            //根据会员id查询会员详情
+            memberInfoHandler(id){
+                this.$http.get('/member/memberInfo?id='+id).then(res=>{
+                    this.modifyMember = res.data
+                    console.log(this.modifyMember)
+                })
+            }
 
-      },
-      //修改按钮操作  打开修改模态 赋值 查询场馆列表
-      toModifyMember(param){
-        this.memberInfoHandler(param.row.id)
-        console.log('修改打印')
-        console.log(param)
-        this.stadiumListHandler()
-        this.modifyModal=true
-      },
-      //选择场馆事件 调用查询会员卡事件
-      stadiumChangeHandler(){
-        this.memberCardListHandler()
-      },
-      //根据场馆id查询会员卡
-      memberCardListHandler(){
-        this.$http.get('/memberCard/cardList?stadiumId='+this.memberForm.stadiumId).then(res=>{
-          this.memberCardList=res.data
-        })
-      },
-      //查询场馆列表
-      stadiumListHandler(){
-        this.$http.get('/stadium/allStadium').then(res=> {
-          this.stadiumList = res.data
-        })
-      },
-      //根据会员id查询会员详情
-      memberInfoHandler(id){
-        this.$http.get('/member/memberInfo?id='+id).then(res=>{
-          this.modifyMember = res.data
-          console.log(this.modifyMember)
-        })
-      }
-
-    },
-    computed: {
-      memberColumns(){
-        let columns = []
-        columns.push({
-          title: '姓名',
-          key: 'name',
-          align:'center'
-        });
-        columns.push({
-          title: '性别',
-          key: 'sex',
-          align:'center',
-          render:(h,params)=>{
-            const row = params.row
-            const text = row.sex=='1'?'男':'女'
-            return h('span',text)
-          }
-        });
-        columns.push({
-          title: '会员卡号码',
-          key: 'memberCardNo',
-          align:'center'
-        });
-        columns.push({
-          title: '账号',
-          key: 'phone',
-          align:'center'
-        });
-        columns.push({
-          title: '电话',
-          key: 'tel',
-          align:'center'
-        });
-        columns.push({
-          title: '状态',
-          key: 'status',
-          align:'center',
-          render:(h,params)=>{
-            const value = params.row.status
-            const text = value=='1'?'正常':value=='2'?'审核中':value=='3'?'审核不通过':'注销'
-            return h('span',text)
-          }
-        });
-        columns.push({
-          title: '操作',
-          key: 'action',
-          width: 250,
-          align: 'center',
-          render: (h, param)=> {
-            return h('div', [
-              h('Button', {
-                props: {
-                  type: 'primary',
-                  size: 'small'
-                },
-                style: {
-                  marginRight: '5px'
-                },
-                on: {
-                  click: () => {
-                    this.modifyModal=true
-                    this.toModifyMember(param)
-                  }
-                }
-              }, '修改'),
+        },
+        computed: {
+            memberColumns(){
+                let columns = []
+                columns.push({
+                    title: '姓名',
+                    key: 'name',
+                    align:'center'
+                });
+                columns.push({
+                    title: '性别',
+                    key: 'sex',
+                    align:'center',
+                    render:(h,params)=>{
+                        const row = params.row
+                        const text = row.sex=='1'?'男':'女'
+                        return h('span',text)
+                    }
+                });
+                columns.push({
+                    title: '会员卡号码',
+                    key: 'memberCardNo',
+                    align:'center'
+                });
+                columns.push({
+                    title: '账号',
+                    key: 'phone',
+                    align:'center'
+                });
+                columns.push({
+                    title: '电话',
+                    key: 'tel',
+                    align:'center'
+                });
+                columns.push({
+                    title: '状态',
+                    key: 'status',
+                    align:'center',
+                    render:(h,params)=>{
+                        const value = params.row.status
+                        const text = value=='1'?'正常':value=='2'?'审核中':value=='3'?'审核不通过':'注销'
+                        return h('span',text)
+                    }
+                });
+                columns.push({
+                    title: '操作',
+                    key: 'action',
+                    width: 250,
+                    align: 'center',
+                    render: (h, param)=> {
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    size: 'small'
+                                },
+                                style: {
+                                    marginRight: '5px'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.modifyModal=true
+                                        this.toModifyMember(param)
+                                    }
+                                }
+                            }, '修改'),
 //              h('Button', {
 //                props: {
 //                  type: 'info',
@@ -414,25 +429,25 @@
 //                  }
 //                }
 //              }, '绑卡'),
-              h('Button', {
-                props: {
-                  type: 'error',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    this.cancelHandler(param.row)
-                  }
-                }
-              }, '注销')
-            ]);
-          }
-        })
-        return columns;
-      }
-    },
-    created(){
-      this.pageListHandler()
+                            h('Button', {
+                                props: {
+                                    type: 'error',
+                                    size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.cancelHandler(param.row)
+                                    }
+                                }
+                            }, '注销')
+                        ]);
+                    }
+                })
+                return columns;
+            }
+        },
+        created(){
+            this.pageListHandler()
+        }
     }
-  }
 </script>
