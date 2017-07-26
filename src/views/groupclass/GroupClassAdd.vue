@@ -38,26 +38,26 @@
           </Col>
           <Col span="8">
           <Form-item label="总人数" prop="total">
-            <Input v-model="groupClassForm.total" placeholder="请输入总人数"></Input>
+            <Input v-model="groupClassForm.total" placeholder="请输入总人数" number></Input>
           </Form-item>
           </Col>
           <Col span="8">
           <Form-item label="剩余人数" prop="surplusNum">
-            <Input v-model="groupClassForm.surplusNum" placeholder="请输入剩余人数"></Input>
+            <Input v-model="groupClassForm.surplusNum" placeholder="请输入剩余人数" number></Input>
           </Form-item>
           </Col>
         </Row>
         <Row>
           <Col span="8">
           <Form-item label="课程时长" prop="timeTotal">
-            <Input v-model="groupClassForm.timeTotal" placeholder="请输入总人数"></Input>
+            <Input v-model="groupClassForm.timeTotal" placeholder="请输入课程时长" number></Input>
           </Form-item>
           </Col>
           <Col span="8">
           <Form-item label="场馆" prop="stadiumId">
-            <Select v-model="groupClassForm.stadiumId" placeholder="请选择场馆" @on-change="stadiumChangeHandler()">
-              <Option :value="item.id" :key="item.id" v-for="item in stadiumList">{{item.name}}</Option>
-            </Select>
+              <Select v-model="groupClassForm.stadiumId" placeholder="请选择场馆" @on-change="stadiumChangeHandler()">
+                <Option :value="item.id" :key="item.id" v-for="item in stadiumList">{{item.name}}</Option>
+              </Select>
           </Form-item>
           </Col>
           <Col span="8">
@@ -101,51 +101,72 @@
   </div>
 </template>
 <script>
-  export default{
-    data(){
-      return {
-        groupClassForm: {},
-        ruleValidate: {
-          name:[{required:true,message:'请输入名称',trigger:'blur'}],
-          total:[{required:true,message:'请输入人数',trigger:'blur'}],
-          surplusNum:[{required:true,message:'请输入剩余人数',trigger:'blur'}],
-          timeTotal:[{required:true,message:'请输入时长',trigger:'blur'}]
+    export default{
+        data(){
+            return {
+                groupClassForm: {
+                    name:'',
+                    total:'',
+                    surplusNum:'',
+                    timeTotal:'',
+                    stadiumId:'',
+                    startDate:'',
+                    endDate:'',
+                    address:''
+                },
+                ruleValidate: {
+                    name:[{required:true,message:'请输入名称',trigger:'blur'}],
+                    total:[{type:'number',required:true,message:'请输入人数',trigger:'blur'}],
+                    surplusNum:[{type:'number',required:true,message:'请输入剩余人数',trigger:'blur'}],
+                    timeTotal:[{type:'number',required:true,message:'请输入时长',trigger:'blur'}],
+                    stadiumId:[{type:'number',required:true,message:'请选择场馆',trigger:'change'}],
+                    coachId:[{type:'number',required:true,message:'请选择教练',trigger:'change'}],
+                    startDate:[{type:'date',required:true,message:'请选择开课日期',trigger:'change'}],
+                    endDate:[{type:'date',required:true,message:'请选择结束日期',trigger:'change'}]
+                },
+                stadiumList:[],
+                coachList:[]
+            }
         },
-        stadiumList:[],
-        coachList:[]
-      }
-    },
-    methods:{
-      //查询场馆列表
-      stadiumListHandler(){
-        this.$http.get('/stadium/allStadium').then(res=>{
-          this.stadiumList=res.data
-        })
-      },
-      //根据场馆查询教练
-      coachListHandler(){
-        this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(res=>{
-          this.coachList=res.data
-        })
-      },
-      //选择场馆事件
-      stadiumChangeHandler(){
-        this.coachListHandler()
-      },
-      //提交按钮事件
-      submit(){
-        console.log(this.groupClassForm)
-        this.$http.post('/groupClass/add',JSON.stringify(this.groupClassForm)).then(res=>{
-          if(res.result==1){
-            this.$Message.success('创建团课成功')
-          }else{
-            this.$Message.error('创建团课失败')
-          }
-        })
-      }
-    },
-    created(){
-      this.stadiumListHandler()
+        methods:{
+            //查询场馆列表
+            stadiumListHandler(){
+                this.$http.get('/stadium/allStadium').then(res=>{
+                    this.stadiumList=res.data
+                })
+            },
+            //根据场馆查询教练
+            coachListHandler(){
+                this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(res=>{
+                    this.coachList=res.data
+                })
+            },
+            //选择场馆事件
+            stadiumChangeHandler(){
+                this.coachListHandler()
+            },
+            //提交按钮事件
+            submit(){
+                let self = this;
+                console.log(this.groupClassForm)
+                self.$refs['groupClassForm'].validate(function (valid) {
+                    if(valid){
+                        self.$http.post('/groupClass/add',JSON.stringify(self.groupClassForm)).then(function (res) {
+                            if(res.result==1){
+                                self.$Message.success('创建团课成功')
+                                self.$refs['groupClassForm'].resetFields();
+                            }else{
+                                self.$Message.error('创建团课失败')
+                            }
+                        })
+                    }else {
+                        self.$Message.error('请将表单填写完整')
+                    }
+                })
+            }
+        },
+        created(){
+            this.stadiumListHandler()
+        }
     }
-  }
 </script>
