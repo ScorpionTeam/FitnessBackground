@@ -33,8 +33,92 @@
     <div class="page">
       <Page   :page-size="page.pageSize" :total="page.total" :current="page.pageNo" @on-change="pageChange"></Page>
     </div>
-    <Modal title="活动详情" >
-
+    <Modal title="活动详情" v-model="modalFlag" :width="800">
+      <Form ref="detail" :model="activityForm" label-position="right" :rules="ruleValidate" :label-width="80">
+        <Row>
+          <Col span="8">
+          <Form-item label="名称" prop="name">
+            <Input v-model="activityForm.name" placeholder="请输入名称"></Input>
+          </Form-item>
+          </Col>
+          <Col span="8">
+          <Form-item label="场馆" prop="stadiumId">
+            <Select v-model="activityForm.stadiumId" placeholder="请选择场馆">
+              <Option :value="item.id" :key="item.id" v-for="item in stadiumList">{{item.name}}</Option>
+            </Select>
+          </Form-item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="8">
+          <Form-item label="开始">
+            <Row>
+              <Col span="16">
+              <Form-item prop="startDate">
+                <Date-picker type="date" placeholder="选择日期" v-model="activityForm.startDate"></Date-picker>
+              </Form-item>
+              </Col>
+            </Row>
+          </Form-item>
+          </Col>
+          <Col span="8">
+          <Form-item label="结束">
+            <Row>
+              <Col span="16">
+              <Form-item prop="endDate">
+                <Date-picker type="date" placeholder="选择日期" v-model="activityForm.endDate"></Date-picker>
+              </Form-item>
+              </Col>
+            </Row>
+          </Form-item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="8">
+          <Form-item label="排序" prop="sort">
+            <Input v-model="activityForm.sort" placeholder="请输入名称"></Input>
+          </Form-item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="8">
+          <Form-item label="状态" prop="status">
+            <!--
+            1进行中  0 已结束  2 未开始
+            -->
+            <Radio-group v-model="activityForm.status">
+              <Radio label="1">正常</Radio>
+              <Radio label="0">失效</Radio>
+            </Radio-group>
+          </Form-item>
+          </Col>
+          <Col span="6">
+          <Form-item label="置顶" prop="showHome">
+            <Radio-group v-model="activityForm.showHome">
+              <Radio label="1">是</Radio>
+              <Radio label="0">否</Radio>
+            </Radio-group>
+          </Form-item>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="15" offset="1">
+          <!--富文本编辑-->
+          <Form-item prop="content" :label-width="1">
+            <quill-editor :content="activityForm.content"
+                          :options="editorOption"
+                          @change="onEditorChange($event)">
+            </quill-editor>
+          </Form-item>
+          </Col>
+        </Row>
+      </Form>
+      <Row>
+        <Col span="8" offset="8">
+        <Button type="primary" @click="updateConfirm">修改</Button>
+        </Col>
+      </Row>
+      <div slot="footer"></div>
     </Modal>
   </div>
 </template>
@@ -49,13 +133,32 @@
                     pageSize:10,
                     totla:0
                 },
+                modalFlag :false,
                 /*详情表单对象*/
-                detailItem:{}
+                activityForm:{
+                    status:'1',
+                    showHome:'0',
+                    name:'',
+                    stadiumId:'',
+                    startDate:'',
+                    endDate:'',
+                    content:''
+                },
+                /*规则*/
+                ruleValidate:{
+                    name:[{required:true,message:'必填',trigger:'blur'}],
+                    stadiumId:[{type:'number',required:true,message:'必填',trigger:'blur'}],
+                    startDate:[{type:'date',required:true,message:'必填',trigger:'blur'}],
+                    endDate:[{type:'date',required:true,message:'必填',trigger:'blur'}],
+                },
+                editorOption:{},
+                stadiumList:[]
             }
         },
         methods:{
             init(){
                 this.pageList();
+                this.stadiumListHandler()
             },
           /*分页*/
             pageList(){
@@ -103,10 +206,59 @@
                     }
                 })
             },
+            /*修改活动详情*/
+            updateConfirm(){
+                let self = this;
+                self.$Modal.confirm({
+                    title:'修改确认',
+                    content:'确认修改么?',
+                    onOk:function(){
+                        self.update()
+                    }
+                })
+            },
+            update(){
+                let self = this;
+                this.$refs['detail'].validate(function(valide){
+                    if(valide){
+                        if(!self.activityForm.content){
+                            self.$Message.error('请填写富文本内容')
+                            return
+                        }
+                        self.$http.post('/activity/update',JSON.stringify(self.activityForm)).then(function(res){
+                            if(res.result==1){
+                                self.$Message.success('修改成功')
+                                self.$refs['detail'].resetFields();
+                                self.pageList()
+                                this.modalFlag = !this.modalFlag
+                            }else {
+                                self.$Message.error(res.error.message)
+                            }
+                        })
+                    }else {
+                        self.$Message.error('请将表单填写完整')
+                    }
+                })
+            },
           /*打开活动详情模态*/
           openModal(val,action){
               console.log(val)
-          }
+              this.activityForm = val
+              this.activityForm.startDate = new Date(this.activityForm.startDate)
+              this.activityForm.endDate = new Date(this.activityForm.endDate)
+              this.modalFlag = !this.modalFlag
+          },
+            //富文本改变事件
+            onEditorChange({editor, html, text}){
+                this.activityForm.content=text
+                this.activityForm.contentHtml=html
+            },
+            //查询场馆列表
+            stadiumListHandler(){
+                this.$http.get('/stadium/allStadium').then(res=>{
+                    this.stadiumList=res.data
+                })
+            },
         },
         computed:{
             activityColumn(){
