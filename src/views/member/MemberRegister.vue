@@ -29,7 +29,9 @@
       <Form ref="memberForm" :model="memberForm" :rules="memberValidate" :label-width="80">
         <Row>
           <Col span="8">
-          <img src="" alt="头像" style="height: 140px;width: 140px;">
+          <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false">
+            <img src="" alt="头像" ref="headPic" style="height: 140px;width: 140px;">
+          </Upload>
           </Col>
           <Col span="8">
           <Form-item label="姓名" prop="name">
@@ -127,66 +129,91 @@
   </div>
 </template>
 <script>
-  export default{
-    data(){
-      return {
-        memberForm: {
-          name:'',
-          phone:'',
-          tel:'',
-          status:'1',
-          sex:'1',
-          stadiumId:'',
-          memberCardId:''
-        },
-        memberValidate: {
-          name:[{required:true,message:'请输入姓名',trigger:'blur'}],
-          phone:[{required:true,message:'请输入手机号',trigger:'blur'}],
-          tel:[{required:true,message:'请输入联系电话',trigger:'blur'}],
-          status:[{required:true,message:'请选择状态',trigger:'change'}],
+  import {imgBaseUrl} from '../../common/WebApi'
+    export default{
+        data(){
+            return {
+                pic:{},
+                uploadUrl:'',
+                memberForm: {
+                    name:'',
+                    phone:'',
+                    tel:'',
+                    status:'1',
+                    sex:'1',
+                    stadiumId:'',
+                    memberCardId:'',
+                    imgUrl:''
+                },
+                memberValidate: {
+                    name:[{required:true,message:'请输入姓名',trigger:'blur'}],
+                    phone:[{required:true,message:'请输入手机号',trigger:'blur'}],
+                    tel:[{required:true,message:'请输入联系电话',trigger:'blur'}],
+                    status:[{required:true,message:'请选择状态',trigger:'change'}],
 //          stadiumId:[{required:true,message:'请选择场馆',trigger:'change'}],
-          identityCard:[{required:true,message:'请输入证件号码',trigger:'blur'}],
+                    identityCard:[{required:true,message:'请输入证件号码',trigger:'blur'}],
 //          memberCardId:[{required:true,message:'请选择会员卡',trigger:'change'}],
-          sex:[{required:true,message:'请选择性别',trigger:'change'}]
-        },
-        stadiumList: [],
-        memberCardList: [],
+                    sex:[{required:true,message:'请选择性别',trigger:'change'}]
+                },
+                stadiumList: [],
+                memberCardList: [],
 
-      }
-    },
-    methods: {
-      stadiumListHandler(){
-        this.$http.get('/stadium/allStadium').then(res=> {
-          this.stadiumList = res.data
-        })
-      },
-      memberCardListHandler(){
-        this.$http.get('/memberCard/cardList?stadiumId='+this.memberForm.stadiumId).then(res=>{
-          this.memberCardList=res.data
-        })
-      },
-      stadiumChangeHandler(){
-        this.memberCardListHandler()
-      },
-      submitValidate(val){
-        this.$refs[val].validate((valid)=>{
-          if(valid){
-            this.register()
-          }
-        })
-      },
-      register(){
-        this.$http.post('/member/register',JSON.stringify(this.memberForm)).then(res=>{
-          if(res.result==1){
-            this.$Message.success('注册成功')
-          }else{
-            console.log(res)
-          }
-        })
-      }
-    },
-    created(){
-      this.stadiumListHandler()
+            }
+        },
+        methods: {
+            /*图片上传*/
+            picUoloadHandler(res,file){
+                console.log(res)
+                this.memberForm.imgUrl = res.data.url
+                this.$refs['headPic'].src=imgBaseUrl+this.memberForm.imgUrl
+            },
+            /*产生随机数*/
+            random(){
+                let max =4,min=2
+                let num = min+Math.round(Math.random()*(max-min))
+                return num
+            },
+            /*体育场馆列表*/
+            stadiumListHandler(){
+                this.$http.get('/stadium/allStadium').then(res=> {
+                    this.stadiumList = res.data
+                })
+            },
+            memberCardListHandler(){
+                this.$http.get('/memberCard/cardList?stadiumId='+this.memberForm.stadiumId).then(res=>{
+                    this.memberCardList=res.data
+                })
+            },
+            stadiumChangeHandler(){
+                this.memberCardListHandler()
+            },
+            submitValidate(val){
+                this.$refs[val].validate((valid)=>{
+                    if(valid){
+                        this.register()
+                    }
+                })
+            },
+            register(){
+                /*判断如果没有传照片自动给一个照片*/
+                if(this.memberForm.imgUrl==''||this.memberForm.imgUrl==undefined){
+                    this.memberForm.imgUrl =this.random()+'.jpeg'
+                    this.$refs['headPic'].src=imgBaseUrl+this.memberForm.imgUrl
+                    console.log(this.memberForm.imgUrl)
+                }
+                this.$http.post('/member/register',JSON.stringify(this.memberForm)).then(res=>{
+                    if(res.result==1){
+                        this.$Message.success('注册成功')
+                    }else{
+                        console.log(res)
+                    }
+                })
+            }
+        },
+        created(){
+            this.stadiumListHandler()
+            /*初始化图片上传地址*/
+            this.uploadUrl = this.$http.defaults.baseURL+'/img/upload'
+        }
     }
-  }
 </script>
