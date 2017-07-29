@@ -178,7 +178,7 @@
                     this.$http.post('/coach/add', JSON.stringify(this.coachForm)).then(function(res){
                         if(res.result==1){
                             self.$Message.success('新增教练成功')
-                            this.pageListHandler()
+                            self.pageListHandler()
                             self.coachAddModal =!self.coachAddModal
                         } else {
                             self.$Message.error('新增教练失败')
@@ -187,11 +187,11 @@
                 }else {
                     this.$http.post('/coach/update', JSON.stringify(this.coachForm)).then(function(res){
                         if(res.result==1){
-                            self.$Message.success('新增教练成功')
-                            this.pageListHandler()
+                            self.$Message.success('修改教练成功')
+                            self.pageListHandler()
                             self.coachAddModal =!self.coachAddModal
                         } else {
-                            self.$Message.error('新增教练失败')
+                            self.$Message.error('修改教练失败')
                         }
                     })
                 }

@@ -12,6 +12,7 @@
   }
 
   .stadium_add_content {
+    overflow: hidden;
     .content {
       width: 50%;
       float: left;
@@ -76,13 +77,15 @@
               </Form-item>
               </Col>
             </Row>
+            <Form-item :label-width="1" prop="content">
+              <!--富文本编辑-->
+              <quill-editor :content="stadiumForm.content"
+                            :options="editorOption"
+                            @change="onEditorChange($event)">
+              </quill-editor>
+            </Form-item>
           </Form>
         </div>
-        <!--富文本编辑-->
-        <quill-editor :content="stadiumForm.content"
-                      :options="editorOption"
-                      @change="onEditorChange($event)">
-        </quill-editor>
       </div>
       <div class="preview">
         <div class="html ql-editor" v-html="stadiumForm.content"></div>
@@ -94,54 +97,57 @@
   </div>
 </template>
 <script>
-  export default {
-    data() {
-      return {
-        name: 'base-example',
-        editorOption: {},
-        stadiumForm: {
-          status: '1',
-          name: '',
-          address: '',
-          city: '110000',
-          content: '<h2>场馆描述</h2>'
+    export default {
+        data() {
+            return {
+                name: 'base-example',
+                editorOption: {},
+                stadiumForm: {
+                    status: '1',
+                    name: '',
+                    address: '',
+                    city: '',
+                    content: '<h2>场馆描述</h2>'
+                },
+                ruleValidate: {
+                    name: [{required: true, message: '名称不能为空', trigger: 'blur'}],
+                    address: [{required: true, message: '地址不能为空', trigger: 'blur'}],
+                    city: [{required: true, message: '请选择城市', trigger: 'change'}],
+                    status: [{required: true, message: '请选择状态', trigger: 'change'}]
+                }
+            }
         },
-        ruleValidate: {
-          name: [{required: true, message: '名称不能为空', trigger: 'blur'}],
-          address: [{required: true, message: '地址不能为空', trigger: 'blur'}],
-          city: [{required: true, message: '请选择城市', trigger: 'change'}],
-          status: [{required: true, message: '请选择状态', trigger: 'change'}]
+        methods: {
+            onEditorChange({editor, html, text}) {
+                console.log(html)
+                this.content = html
+                this.stadiumForm.content = html
+            },
+            submit(val){
+                let self = this
+                //提交表单校验
+                this.$refs[val].validate(function(valid){
+                    if (valid) {
+                        self.save()
+                    } else {
+                        this.$Message.error('表单验证失败')
+                    }
+                })
+            },
+            save(){
+                //保存场馆信息
+                let  self = this;
+                console.log(this.stadiumForm)
+                this.$http.post('/stadium/add', JSON.stringify(this.stadiumForm)).then(function (res) {
+                    let data = res;
+                    if (data.result == 1) {
+                        self.$Message.success('创建场馆成功')
+                        self.$refs['stadiumForm'].resetFields()
+                    } else {
+                        self.$Message.error('创建场馆失败')
+                    }
+                })
+            }
         }
-      }
-    },
-    methods: {
-      onEditorChange({editor, html, text}) {
-        console.log(html)
-        this.content = html
-        this.stadiumForm.content = html
-      },
-      submit(val){
-        //提交表单校验
-        this.$refs[val].validate((valid)=> {
-          if (valid) {
-            this.save()
-          } else {
-            this.$Message.error('表单验证失败')
-          }
-        })
-      },
-      save(){
-        //保存场馆信息
-        console.log(this.stadiumForm)
-        this.$http.post('/stadium/add', JSON.stringify(this.stadiumForm)).then(res=> {
-          let data = res;
-          if (data.result == 1) {
-            this.$Message.success('创建场馆成功')
-          } else {
-            this.$Message.error('创建场馆失败')
-          }
-        })
-      }
     }
-  }
 </script>
