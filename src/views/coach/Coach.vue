@@ -22,7 +22,7 @@
       <div class="coach_search">
         <Input placeholder="请输入教练姓名..." v-model="key" style="width: 300px"></Input>
         <Button type="primary" icon="ios-search" @click="search()">搜索</Button>
-        <Button type="primary" icon="plus" @click="coachAddHandler()">创建</Button>
+        <Button type="primary" icon="plus" @click="openModalHandler('add')">创建</Button>
       </div>
     </div>
     <Table :columns="coachColumns" :data="coachList"></Table>
@@ -30,10 +30,8 @@
       <Page :total="page.total" :current="page.pageNo" :page-size="page.pageSize"
             @on-change="pageChangeHandler($event)"></Page>
     </div>
-
-
     <!--创建教练信息-->
-    <Modal title="新增教练" v-model="coachAddModal">
+    <Modal :title="detailTitle" v-model="coachAddModal">
       <Form ref="coachForm" :model="coachForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="12">
@@ -78,7 +76,7 @@
         </Row>
         <Row>
           <Col span="24">
-          <Form-item label="描述">
+          <Form-item label="描述" prop="description">
             <Input v-model="coachForm.description" type="textarea" :autosize="{minRows: 2,maxRows: 5}"
                    placeholder="请输入..."></Input>
           </Form-item>
@@ -92,113 +90,181 @@
   </div>
 </template>
 <script>
-  export default{
-    data(){
-      return {
-        coachList: [],
-        coach: {},
-        coachAddModal: false,
-        coachForm: {
-          name: '',
-          phone: '',
-          organization: '',
-          validDate: '',
-          status: '1',
-          stadiumId: '',
-          description: ''
+    export default{
+        data(){
+            return {
+                coachList: [],
+                coach: {},
+                coachAddModal: false,
+                coachForm: {
+                    name: '',
+                    phone: '',
+                    organization: '',
+                    validDate: '',
+                    status: '1',
+                    stadiumId: '',
+                    description: ''
+                },
+                stadiumList: [],
+                ruleValidate: {
+                    name: [{required: true, message: '请填写教练名称', trigger: 'blur'}],
+                    phone: [{required: true, message: '请填写联系电话', trigger: 'blur'}],
+                    organization: [{required: true, message: '请填写认证机构', trigger: 'blur'}],
+                    status: [{required: true, message: '请填写认证机构', trigger: 'change'}],
+                    validDate: [{type:'date',required: true, message: '请选择有效期', trigger: 'change'}],
+                    stadiumId: [{type:'number',required: true, message: '请选择场馆', trigger: 'change'}],
+                },
+                page: {
+                    pageNo: 1,
+                    pageSize: 10,
+                    total: 0
+                },
+                key: '',
+                action:'add',
+              /*模态标题*/
+                detailTitle:'新增教练'
+
+            }
         },
-        stadiumList: [],
-        ruleValidate: {
-          name: [{required: true, message: '请填写教练名称', trigger: 'blur'}],
-          phone: [{required: true, message: '请填写联系电话', trigger: 'blur'}],
-          organization: [{required: true, message: '请填写认证机构', trigger: 'blur'}]
-//          validDate: [{required: true, message: '请选择有效期', trigger: 'blur'}],
-//          stadiumId: [{required: true, message: '请选择场馆', trigger: 'blur'}],
+        methods: {
+            search(){
+                this.page.pageNo = 1;
+                this.pageListHandler()
+            },
+          /*分页*/
+            pageListHandler(){
+                let url = '/coach/list?pageNo=' + this.page.pageNo + '&pageSize=' + this.page.pageSize + '&key=' + this.key;
+                this.$http.get(url).then(res=> {
+                    this.coachList = res.data;
+                    this.page.total=res.total;
+                })
+            },
+          /*打开模态*/
+            openModalHandler(action,val){
+                if(action=='add'){
+                    this.action = action
+                    this.detailTitle = '新增教练'
+                  /*清空*/
+                    this.$refs['coachForm'].resetFields()
+                }else {
+                    this.action = action
+                    this.detailTitle = '修改教练'
+                    let row = Object.assign({},val)
+                    row.validDate = new Date(row.validDate)
+                    this.coachForm = row
+                }
+                this.coachAddModal = !this.coachAddModal
+            },
+          /*获取所有场馆*/
+            stadiumListHandler(){
+                let self = this;
+                let url = '/stadium/allStadium'
+                this.$http.get(url).then(res=> {
+                    self.stadiumList = res.data
+                })
+            },
+            submitHandler(val){
+                this.$refs[val].validate((valid)=> {
+                    if (valid) {
+                        this.save()
+                    } else {
+                        this.$Message.warning('数据校验失败')
+                    }
+                })
+            },
+            save(){
+                let self = this;
+                if(this.action=='add'){
+                    this.$http.post('/coach/add', JSON.stringify(this.coachForm)).then(function(res){
+                        if(res.result==1){
+                            self.$Message.success('新增教练成功')
+                            this.pageListHandler()
+                            self.coachAddModal =!self.coachAddModal
+                        } else {
+                            self.$Message.error('新增教练失败')
+                        }
+                    })
+                }else {
+                    this.$http.post('/coach/update', JSON.stringify(this.coachForm)).then(function(res){
+                        if(res.result==1){
+                            self.$Message.success('新增教练成功')
+                            this.pageListHandler()
+                            self.coachAddModal =!self.coachAddModal
+                        } else {
+                            self.$Message.error('新增教练失败')
+                        }
+                    })
+                }
+            },
+            pageChangeHandler(event){
+                this.page.pageNo=event
+            },
         },
-        page: {
-          pageNo: 1,
-          pageSize: 10,
-          total: 0
+        computed: {
+            coachColumns(){
+                let self =this;
+                let columns = []
+                columns.push({
+                    title: '姓名',
+                    key: 'name',
+                    align: 'center'
+                });
+                columns.push({
+                    title: '电话',
+                    key: 'phone',
+                    align: 'center'
+                });
+                columns.push({
+                    title: '场馆',
+                    key: 'stadiumName',
+                    align: 'center'
+                });
+                columns.push({
+                    title: '状态',
+                    key: 'status',
+                    align: 'center',
+                    render:(h,param)=>{
+                        let status = param.row.status
+                        let text = status =='1'?'在职':'离职'
+                        return ('span',text)
+                    }
+                });
+                columns.push({
+                    title:'操作管理',
+                    render:function (h,params) {
+                        return h('ButtonGroup',[
+                            h('Button',{
+                                props:{
+                                    type:'primary',
+                                    size:'small'
+                                },
+                                style:{
+                                    marginRight:'10px'
+                                },
+                                on:{
+                                    click:function () {
+                                        self.openModalHandler('update',params.row)
+                                    }
+                                }
+                            },'修改')
+                            /*h('Button',{
+                                props:{
+                                    type:'error',
+                                    size:'small'
+                                },
+                                style:{
+                                    marginRight:'10px'
+                                }
+                            },'删除')*/
+                        ])
+                    }
+                })
+                return columns;
+            }
         },
-        key: ''
-      }
-    },
-    methods: {
-      search(){
-        this.pageListHandler()
-      },
-      pageListHandler(){
-        let url = '/coach/list?pageNo=' + this.page.pageNo + '&pageSize=' + this.page.pageSize + '&key=' + this.key;
-        this.$http.get(url).then(res=> {
-          this.coachList = res.data;
-          this.page.total=res.total;
-        })
-      },
-      coachAddHandler(){
-        this.coachAddModal = true
-      },
-      stadiumListHandler(){
-        let url = '/stadium/allStadium'
-        this.$http.get(url).then(res=> {
-          this.stadiumList = res.data
-        })
-      },
-      submitHandler(val){
-        this.$refs[val].validate((valid)=> {
-          if (valid) {
-            this.save()
-          } else {
-            this.$Message.warning('数据校验失败')
-          }
-        })
-      },
-      save(){
-        this.$http.post('/coach/add', JSON.stringify(this.coachForm)).then(res=> {
-          if (res.result == 1) {
-            this.$Message.success('新增教练成功')
+        created(){
+            this.stadiumListHandler()
             this.pageListHandler()
-          } else {
-            this.$Message.error('新增教练失败')
-          }
-        })
-      },
-      pageChangeHandler(event){
-        this.page.pageNo=event
-      }
-    },
-    computed: {
-      coachColumns(){
-        let columns = []
-        columns.push({
-          title: '姓名',
-          key: 'name',
-          align: 'center'
-        });
-        columns.push({
-          title: '电话',
-          key: 'phone',
-          align: 'center'
-        });
-        columns.push({
-          title: '场馆',
-          key: 'stadiumName',
-          align: 'center'
-        });
-        columns.push({
-          title: '状态',
-          key: 'status',
-          align: 'center',
-          render:(h,param)=>{
-            let status = param.row.status
-            let text = status =='1'?'在职':'离职'
-            return ('span',text)
-          }
-        });
-        return columns;
-      }
-    },
-    created(){
-      this.pageListHandler()
+        }
     }
-  }
 </script>
