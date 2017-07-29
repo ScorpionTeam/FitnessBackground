@@ -99,7 +99,9 @@
       <Form ref="modifyMember" :model="modifyMember" :rules="modifyValidate" :label-width="80">
         <Row>
           <Col span="8">
-          <img src="" alt="头像" style="height: 140px;width: 140px;">
+          <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false">
+            <img src="" alt="头像" ref="headPic" style="height: 140px;width: 140px;">
+          </Upload>
           </Col>
           <Col span="8">
           <Form-item label="姓名" prop="name">
@@ -199,11 +201,12 @@
     </Modal>
   </div>
 </template>
-
 <script>
+  import {imgBaseUrl} from '../../common/WebApi'
     export default {
         data () {
             return {
+                uploadUrl:'',
                 memberList:[],
                 page:{
                     pageNo:1,
@@ -239,6 +242,12 @@
             }
         },
         methods:{
+          /*图片上传*/
+            picUoloadHandler(res,file){
+                console.log(res)
+                this.modifyMember.imgPath = res.data.url
+                this.$refs['headPic'].src=imgBaseUrl+this.modifyMember.imgPath
+            },
             //分页方法
             pageListHandler(){
                 this.$http.get('/member/list?pageNo='+this.page.pageNo+"&pageSize="+this.page.pageSize+"&key="+this.key).then(res=>{
@@ -343,9 +352,12 @@
             },
             //根据会员id查询会员详情
             memberInfoHandler(id){
+                let self =this
                 this.$http.get('/member/memberInfo?id='+id).then(res=>{
-                    this.modifyMember = res.data
-                    console.log(this.modifyMember)
+                    console.log('会员')
+                    self.modifyMember = res.data
+                    console.log(self.modifyMember)
+                    self.$refs['headPic'].src=imgBaseUrl+this.modifyMember.imgPath
                 })
             }
 
@@ -410,7 +422,6 @@
                                 },
                                 on: {
                                     click: () => {
-                                        this.modifyModal=true
                                         this.toModifyMember(param)
                                     }
                                 }
@@ -435,7 +446,7 @@
                                     size: 'small'
                                 },
                                 on: {
-                                    click: () => {
+                                    click: function () {
                                         this.cancelHandler(param.row)
                                     }
                                 }
@@ -447,6 +458,7 @@
             }
         },
         created(){
+            this.uploadUrl = this.$http.defaults.baseURL+'/img/upload'
             this.pageListHandler()
         }
     }
