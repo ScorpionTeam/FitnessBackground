@@ -220,7 +220,7 @@
                     if (valid) {
                         self.save()
                     } else {
-                        this.$Message.error('表单验证失败')
+                        self.$Message.error('表单验证失败')
                     }
                 })
             },
@@ -241,12 +241,12 @@
             },
           /*分页*/
             pageListHandler(){
+                let self = this;
                 //查询列表事件
                 let url = "/stadium/list?pageNo=" + this.page.pageNo + "&pageSize=" + this.page.pageSize + "&key=" + this.key;
                 this.$http.get(url).then(res=> {
-                    this.stadiumList = res.data;
-                    this.page.pageNo = res.pageNo
-                    this.page.total = res.total
+                    self.stadiumList = res.data;
+                    self.page.total = res.total
                 })
             },
             pageChangeHandler(event){
@@ -270,14 +270,15 @@
                 this.open = true
             },
             removeConfirmHandler(){
+                let self = this;
                 this.open = !this.open
                 this.$http.post('/stadium/del?id=' + this.removeId).then(res=> {
                     console.log('返回结果')
                     if(res.result==1){
-                        this.$Message.success(res.data)
-                        this.pageListHandler()
+                        self.$Message.success(res.data)
+                        self.pageListHandler()
                     }else{
-                        this.$Message.error(res.data)
+                        self.$Message.error(res.data)
                     }
                 })
             }

@@ -191,6 +191,7 @@
                     if(res.result==1){
                         console.log(res)
                         self.groupList = res.data
+                        self.page.total = res.total
                     }else {
                         self.$Message.error(res.error.message)
                     }
