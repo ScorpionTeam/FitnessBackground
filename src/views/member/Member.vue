@@ -77,7 +77,6 @@
         <Button type="primary" >确定</Button>
       </div>
     </Modal>
-
     <!--Prompt提示框-->
     <Modal v-model="open" width="360">
       <p slot="header" style="color:#f60;text-align:center">
@@ -91,11 +90,8 @@
         <Button type="error" size="large" long @click="cancelMemberOkHandler()">删除</Button>
       </div>
     </Modal>
-
-
-
     <!--会员修改模态-->
-    <Modal title="会员修改" v-model="modifyModal" width="1000">
+    <Modal title="会员修改" v-model="modifyModal" width="1000" :mask-closable="false">
       <Form ref="modifyMember" :model="modifyMember" :rules="modifyValidate" :label-width="80">
         <Row>
           <Col span="8">
@@ -110,7 +106,7 @@
           </Col>
           <Col span="8">
           <Form-item label="手机" prop="phone">
-            <Input v-model="modifyMember.phone" placeholder="请输入手机"></Input>
+            <Input v-model="modifyMember.phone" placeholder="请输入手机" disabled></Input>
           </Form-item>
           </Col>
           <Col span="8">
@@ -137,8 +133,9 @@
           <Form-item label="状态" prop="status">
             <Select v-model="modifyMember.status" placeholder="请选择状态">
               <Option value="1">正常</Option>
-              <Option value="2">审核不通过</Option>
-              <Option value="3">注销</Option>
+              <Option value="2">审核中</Option>
+              <Option value="3">审核不通过</Option>
+              <Option value="4">注销</Option>
             </Select>
           </Form-item>
           </Col>
@@ -202,7 +199,7 @@
   </div>
 </template>
 <script>
-  import {imgBaseUrl} from '../../common/WebApi'
+    import {imgBaseUrl} from '../../common/WebApi'
     export default {
         data () {
             return {
@@ -217,6 +214,7 @@
                 memberCardModal:false,
                 memberCard:'',
                 memberCardList:[],
+              /*注销对象*/
                 member:{},
                 memberInfoModal:false,
                 ruleValidate:{
@@ -244,17 +242,16 @@
         methods:{
           /*图片上传*/
             picUoloadHandler(res,file){
-                console.log(res)
-                this.modifyMember.imgPath = res.data.url
-                this.$refs['headPic'].src=imgBaseUrl+this.modifyMember.imgPath
+                this.modifyMember.imgUrl = res.data.url
+                this.$refs['headPic'].src=imgBaseUrl+this.modifyMember.imgUrl
             },
             //分页方法
             pageListHandler(){
-                this.$http.get('/member/list?pageNo='+this.page.pageNo+"&pageSize="+this.page.pageSize+"&key="+this.key).then(res=>{
-                    console.log(res.data)
-                    this.memberList=res.data
-                    this.page.total=res.total
-                    this.page.pageNo=res.pageNo
+                let self = this
+                this.$http.get('/member/list?pageNo='+this.page.pageNo+"&pageSize="+this.page.pageSize+"&key="+this.key).then(function(res){
+                    self.memberList=res.data
+                    self.page.total=res.total
+                    self.page.pageNo=res.pageNo
                 })
             },
             //页码改变事件
@@ -298,25 +295,28 @@
             },
             //确认注销操作
             cancelMemberOkHandler(){
+                let self = this;
                 this.$http.post('/member/cancel?id='+this.member.id).then(res=>{
                     if(res.result==1){
-                        this.$Message.success('注销会员成功')
-                        this.pageListHandler()
-                    }else{
-                        this.$Message.error('注销会员失败')
-                    }
-                })
+                    self.$Message.success('注销会员成功')
+                    self.pageListHandler()
+                    self.open= false
+                }else{
+                    self.$Message.error('注销会员失败')
+                }
+            })
             },
             //修改提交先进行校验操作
             submitValidate(val){
                 let self =this;
+                console.log(val)
                 self.$refs[val].validate(function(valid){
                     if(valid){
                         self.$http.post('/member/update',JSON.stringify(self.modifyMember)).then(function(res){
                             if(res.result){
                                 self.$Message.success('修改成功')
                                 self.pageListHandler()
-                                this.modifyModal=!this.modifyModal;
+                                self.modifyModal=!self.modifyModal;
                             }else {
                                 self.$Message.error(res.error.message)
                             }
@@ -330,7 +330,6 @@
             toModifyMember(param){
                 this.memberInfoHandler(param.row.id)
                 console.log('修改打印')
-                console.log(param)
                 this.stadiumListHandler()
                 this.modifyModal=true
             },
@@ -353,17 +352,18 @@
             //根据会员id查询会员详情
             memberInfoHandler(id){
                 let self =this
-                this.$http.get('/member/memberInfo?id='+id).then(res=>{
+                this.$http.get('/member/memberInfo?id='+id).then(function(res){
                     console.log('会员')
                     self.modifyMember = res.data
                     console.log(self.modifyMember)
-                    self.$refs['headPic'].src=imgBaseUrl+this.modifyMember.imgPath
+                    self.$refs['headPic'].src=imgBaseUrl+self.modifyMember.imgUrl
                 })
             }
 
         },
         computed: {
             memberColumns(){
+                let self = this
                 let columns = []
                 columns.push({
                     title: '姓名',
@@ -371,15 +371,15 @@
                     align:'center'
                 });
                 columns.push({
-                    title: '性别',
-                    key: 'sex',
-                    align:'center',
-                    render:(h,params)=>{
+                        title: '性别',
+                        key: 'sex',
+                        align:'center',
+                        render:(h,params)=>{
                         const row = params.row
                         const text = row.sex=='1'?'男':'女'
                         return h('span',text)
                     }
-                });
+            });
                 columns.push({
                     title: '会员卡号码',
                     key: 'memberCardNo',
@@ -396,21 +396,21 @@
                     align:'center'
                 });
                 columns.push({
-                    title: '状态',
-                    key: 'status',
-                    align:'center',
-                    render:(h,params)=>{
+                        title: '状态',
+                        key: 'status',
+                        align:'center',
+                        render:(h,params)=>{
                         const value = params.row.status
                         const text = value=='1'?'正常':value=='2'?'审核中':value=='3'?'审核不通过':'注销'
                         return h('span',text)
                     }
-                });
+            });
                 columns.push({
-                    title: '操作',
-                    key: 'action',
-                    width: 250,
-                    align: 'center',
-                    render: (h, param)=> {
+                        title: '操作',
+                        key: 'action',
+                        width: 250,
+                        align: 'center',
+                        render: (h, param)=> {
                         return h('div', [
                             h('Button', {
                                 props: {
@@ -422,10 +422,10 @@
                                 },
                                 on: {
                                     click: () => {
-                                        this.toModifyMember(param)
-                                    }
-                                }
-                            }, '修改'),
+                                    self.toModifyMember(param)
+                            }
+                    }
+            }, '修改'),
 //              h('Button', {
 //                props: {
 //                  type: 'info',
@@ -440,20 +440,20 @@
 //                  }
 //                }
 //              }, '绑卡'),
-                            h('Button', {
-                                props: {
-                                    type: 'error',
-                                    size: 'small'
-                                },
-                                on: {
-                                    click: function () {
-                                        this.cancelHandler(param.row)
-                                    }
-                                }
-                            }, '注销')
-                        ]);
+                h('Button', {
+                    props: {
+                        type: 'error',
+                        size: 'small'
+                    },
+                    on: {
+                        click: function () {
+                            self.cancelHandler(param.row)
+                        }
                     }
-                })
+                }, '注销')
+            ]);
+            }
+            })
                 return columns;
             }
         },
