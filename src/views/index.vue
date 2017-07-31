@@ -7,7 +7,7 @@
   .index_header {
     position: fixed;
     width: 100%;
-    z-index: 2;
+    z-index: 10;
   }
 
   .index_layout {
@@ -15,8 +15,11 @@
     height: 100%;
     padding-top: 60px;
     .index_menu {
-      position: fixed;
+      /*position: fixed;*/
+      /*height: 100%;*/
+      position: absolute;
       height: 100%;
+      overflow-y: scroll;
     }
     .index_content {
       margin-left: 240px;
