@@ -288,12 +288,12 @@
                     align:'center',
                     width:200
                 })
-                columns.push({
-                    title:'结束时间',
-                    key:'endDate',
-                    align:'center',
-                    width:200
-                })
+//                columns.push({
+//                    title:'结束时间',
+//                    key:'endDate',
+//                    align:'center',
+//                    width:200
+//                })
                 columns.push({
                     title:'状态',
                     key:'status',
