@@ -12,10 +12,17 @@
     .img_page{
         line-height: 60px;
     }
+    /*图片模态*/
     .displayImg{
         width: 300px;
         height: 300px;
         object-fit: cover;
+    }
+    .picAdress{
+        display: inline-block;
+        width:100%;
+        padding: 20px;
+        text-align: center;
     }
 </style>
 <template>
@@ -47,14 +54,12 @@
                 </Row>
                 <Row v-if="!picFlg">
                     <Col span="24" style="text-align: center">
-                        <img src="" alt="头像" class="displayImg" ref="headPic">
+                        <img src="" alt="头像" class="displayImg" ref="picDetail">
                     </Col>
                 </Row>
                 <Row>
                     <Col span="24">
-                    <Form-item label="地址" prop="url">
-                        <Input v-model="imgForm.url" placeholder="请输入图片地址" disabled ></Input>
-                    </Form-item>
+                        <span class="picAdress">{{imgForm.url}}</span>
                     </Col>
                 </Row>
             </Form>
@@ -112,7 +117,7 @@
                     this.action = action
                     this.detailTitle = '新增图片'
                     /*清空*/
-                    this.$refs['imgForm'].resetFields()
+                    this.imgForm.url = ''
                     this.$refs['headPic'].src=''
                 }else {
                     this.action = action
@@ -120,7 +125,9 @@
                     this.detailTitle = '图片详情'
                     let row = Object.assign({},val)
                     this.imgForm = row
-                    this.$refs['headPic'].src=row.url
+                    this.$nextTick(function () {
+                        this.$refs['picDetail'].src=row.url
+                    })
                 }
                 this.imgAddModal = !this.imgAddModal
             },
