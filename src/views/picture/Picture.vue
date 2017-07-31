@@ -64,7 +64,6 @@
         data(){
             return {
                 imgList: [],
-                img: {},
                 imgAddModal: false,
                 imgForm: {
                     url: ''
@@ -148,12 +147,12 @@
                     title: '展示',
                     key: 'url',
                     align: 'center',
-                    width:'100',
+                    width:'150',
                     render:function (h,params) {
                         return h('img',{
                             style:{
-                                width:'50px',
-                                height:'50px',
+                                width:'100px',
+                                height:'100px',
                                 objectFit:'cover'
                             },
                             attrs:{
@@ -164,8 +163,8 @@
                 });
                 columns.push({
                     title: '创建时间',
-                    key: 'total',
-                    align: 'createDate'
+                    key: 'createDate',
+                    align: 'center'
                 });
                 columns.push({
                     title:'操作管理',
