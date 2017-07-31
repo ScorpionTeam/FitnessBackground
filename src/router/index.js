@@ -17,6 +17,7 @@ import News from '@/views/news/News.vue'
 import StatisticsMain from '@/views/statistics/StatisticsMain.vue'
 import Impression from '@/views/impression/Impression.vue'
 import Meal from '@/views/meal/Meal.vue'
+import  Picture from '@/views/picture/Picture.vue'
 
 
 Vue.use(Router)
@@ -140,7 +141,14 @@ export default new Router({
             title: '餐饮'
           },
           component: Meal
-        }]
+        },{
+              path: '/picture',
+              name: 'picture',
+              meta: {
+                  title: '图片'
+              },
+              component: Picture
+          }]
     }, {
       path: '/login',
       name: 'login',

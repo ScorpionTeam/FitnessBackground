@@ -45,6 +45,10 @@
         <Icon type="stats-bars" size="20"></Icon>
         统计
       </Menu-item>
+      <Menu-item name="picture">
+        <Icon type="image" size="20"></Icon>
+        图片
+      </Menu-item>
     </Menu>
   </div>
 
