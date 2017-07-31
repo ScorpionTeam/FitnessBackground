@@ -12,6 +12,11 @@
     .img_page{
         line-height: 60px;
     }
+    .displayImg{
+        width: 300px;
+        height: 300px;
+        object-fit: cover;
+    }
 </style>
 <template>
     <div>
@@ -42,7 +47,7 @@
                 </Row>
                 <Row v-if="!picFlg">
                     <Col span="24" style="text-align: center">
-                        <img src="" alt="头像" ref="headPic" style="height: 140px;width: 140px;">
+                        <img src="" alt="头像" class="displayImg" ref="headPic">
                     </Col>
                 </Row>
                 <Row>
