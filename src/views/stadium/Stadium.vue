@@ -33,7 +33,7 @@
             @on-change="pageChangeHandler($event)"></Page>
     </div>
     <!--修改模态-->
-    <Modal title="修改场馆" v-model="detailFlag" >
+    <Modal title="修改场馆" v-model="detailFlag" :mask-closable="false">
       <Form ref="stadiumForm" :model="stadiumForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="16">
