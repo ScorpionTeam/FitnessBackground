@@ -33,11 +33,16 @@
         <!--创建餐饮信息-->
         <Modal :title="detailTitle" v-model="imgAddModal">
             <Form ref="imgForm" :model="imgForm" :rules="ruleValidate" :label-width="80">
-                <Row>
+                <Row v-if="picFlg">
                     <Col span="24">
                     <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
                         <img src="" alt="头像" ref="headPic" style="height: 140px;width: 140px;">
                     </Upload>
+                    </Col>
+                </Row>
+                <Row v-if="!picFlg">
+                    <Col span="24" style="text-align: center">
+                        <img src="" alt="头像" ref="headPic" style="height: 140px;width: 140px;">
                     </Col>
                 </Row>
                 <Row>
@@ -66,6 +71,8 @@
                 },
                 /*图片上传地址*/
                 uploadUrl:'',
+                /*图片显示标志*/
+                picFlg:true,
                 ruleValidate: {
                     url: [{required: true, message: '请填写图片地址', trigger: 'blur'}]
                 },
@@ -97,6 +104,7 @@
             /*打开模态*/
             openModalHandler(action,val){
                 if(action=='add'){
+                    this.picFlg = true
                     this.action = action
                     this.detailTitle = '新增图片'
                     /*清空*/
@@ -104,36 +112,13 @@
                     this.$refs['headPic'].src=''
                 }else {
                     this.action = action
+                    this.picFlg = false
                     this.detailTitle = '图片详情'
                     let row = Object.assign({},val)
                     this.imgForm = row
                     this.$refs['headPic'].src=row.url
                 }
                 this.imgAddModal = !this.imgAddModal
-            },
-            save(){
-                let self = this;
-                if(this.action=='add'){
-                    this.$http.post('/img/add', JSON.stringify(this.imgForm)).then(function(res){
-                        if(res.result==1){
-                            self.$Message.success('新增图片成功')
-                            self.pageListHandler()
-                            self.imgAddModal =!self.imgAddModal
-                        } else {
-                            self.$Message.error('新增图片失败')
-                        }
-                    })
-                }else {
-                    this.$http.post('/img/update', JSON.stringify(this.imgForm)).then(function(res){
-                        if(res.result==1){
-                            self.$Message.success('修改图片成功')
-                            self.pageListHandler()
-                            self.imgAddModal =!self.imgAddModal
-                        } else {
-                            self.$Message.error('修改图片失败')
-                        }
-                    })
-                }
             },
             pageChangeHandler(event){
                 this.page.pageNo=event
@@ -144,9 +129,9 @@
                 this.$refs['headPic'].src=imgBaseUrl+res.data.url
                 this.imgForm.url = res.data.url
                 /*上传成功提示*/
-                self.$Message.success('上传成功')
-                self.pageListHandler();
-                self.imgAddModal =!self.imgAddModal
+                this.$Message.success('上传成功')
+                this.pageListHandler();
+                this.imgAddModal =!this.imgAddModal
             }
         },
         computed: {
@@ -156,12 +141,26 @@
                 columns.push({
                     title: 'id',
                     key: 'id',
-                    align: 'center'
+                    align: 'center',
+                    width:'100'
                 });
                 columns.push({
-                    title: '地址',
+                    title: '展示',
                     key: 'url',
-                    align: 'center'
+                    align: 'center',
+                    width:'100',
+                    render:function (h,params) {
+                        return h('img',{
+                            style:{
+                                width:'50px',
+                                height:'50px',
+                                objectFit:'cover'
+                            },
+                            attrs:{
+                                src:params.row.url
+                            }
+                        })
+                    }
                 });
                 columns.push({
                     title: '创建时间',
