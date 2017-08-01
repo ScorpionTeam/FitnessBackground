@@ -78,7 +78,7 @@
       </div>
     </Modal>
     <!--Prompt提示框-->
-    <Modal v-model="open" width="360">
+    <Modal v-model="open" width="360" :mask-closable="false">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>注销确认</span>

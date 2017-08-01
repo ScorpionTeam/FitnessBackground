@@ -52,7 +52,7 @@
     <div class="page">
       <Page   :page-size="page.pageSize" :total="page.total" :current="page.pageNo" @on-change="pageChange"></Page>
     </div>
-    <Modal title="团课详情" v-model="detailFlag" :width="1000" @on-ok="updateConfirm">
+    <Modal title="团课详情" v-model="detailFlag" :width="1000" @on-ok="updateConfirm" :mask-closable="false">
       <Form ref="groupClassForm" :model="groupClassForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="8">
@@ -117,11 +117,36 @@
           </Form-item>
           </Col>
         </Row>
+        <Row>
+          <Col span="12">
+          <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
+            <img src="" alt="主图" ref="mainPic" style="height: 160px;width: 160px;">
+          </Upload>
+          </Col>
+          <Col span="12">
+          <Upload :action="uploadUrl"  :on-success="scrollOneHandler" :show-upload-list="false" style="text-align: center">
+            <img src="" alt="轮播图" ref="scrollOne" style="height: 160px;width: 160px;">
+          </Upload>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+          <Upload :action="uploadUrl"  :on-success="scrollTwoHandler" :show-upload-list="false" style="text-align: center">
+            <img src="" alt="轮播图" ref="scrollTwo" style="height: 160px;width: 160px;">
+          </Upload>
+          </Col>
+          <Col span="12">
+          <Upload :action="uploadUrl"  :on-success="scrollThreeHandler" :show-upload-list="false" style="text-align: center">
+            <img src="" alt="轮播图" ref="scrollThree" style="height: 160px;width: 160px;">
+          </Upload>
+          </Col>
+        </Row>
       </Form>
     </Modal>
   </div>
 </template>
 <script>
+    import {imgBaseUrl} from'../../common/WebApi'
     export default{
         data(){
             return {
@@ -149,7 +174,9 @@
                     stadiumId:'',
                     startDate:'',
                     endDate:'',
-                    address:''
+                    address:'',
+                    mainImgUrl:'',
+                    imgList:[]
                 },
                 ruleValidate: {
                     name:[{required:true,message:'请输入名称',trigger:'blur'}],
@@ -160,7 +187,9 @@
                     coachId:[{type:'number',required:true,message:'请选择教练',trigger:'change'}],
                     startDate:[{type:'date',required:true,message:'请选择开课日期',trigger:'change'}],
                     endDate:[{type:'date',required:true,message:'请选择结束日期',trigger:'change'}]
-                }
+                },
+              /*图片上传地址*/
+                uploadUrl:''
             }
         },
         methods:{
@@ -230,6 +259,28 @@
                 this.groupClassForm = val
                 this.groupClassForm.startDate = new Date(this.groupClassForm.startDate)
                 this.groupClassForm.endDate = new Date(this.groupClassForm.endDate)
+              /*初始化图片*/
+                this.groupClass(val.id)
+            },
+            /*团课详情*/
+            groupClass(id){
+                let self = this
+                self.$http.get('/groupClass/classInfo?id='+id).then(function(res){
+                    if(res.result==1){
+                        self.groupClassForm.imgList = res.data.imgList
+                        if(res.data.imgList.length==0||res.data.mainImgUrl==''){
+                            self.$refs['mainPic'].src=''
+                            self.$refs['scrollOne'].src=''
+                            self.$refs['scrollTwo'].src=''
+                            self.$refs['scrollThree'].src=''
+                            return
+                        }
+                        self.$refs['mainPic'].src=imgBaseUrl+self.groupClassForm.mainImgUrl
+                        self.$refs['scrollOne'].src=imgBaseUrl+self.groupClassForm.imgList[0].url
+                        self.$refs['scrollTwo'].src=imgBaseUrl+self.groupClassForm.imgList[1].url
+                        self.$refs['scrollThree'].src=imgBaseUrl+self.groupClassForm.imgList[2].url
+                    }
+                })
             },
           /*修改*/
             updateConfirm(){
@@ -245,6 +296,11 @@
             update(){
                 let self = this;
                 self.$refs['groupClassForm'].validate(function (valid) {
+                  /*判断是否图片都上传了*/
+                    if(self.groupClassForm.mainImgUrl==''||self.groupClassForm.mainImgUrl==undefined||self.groupClassForm.imgList.length!=3){
+                        self.$Message.error('请上传图片')
+                        return
+                    }
                     if(valid){
                         self.$http.post('/groupClass/update',JSON.stringify(self.groupClassForm)).then(function (res) {
                             if(res.result==1){
@@ -282,7 +338,32 @@
                         self.$Message.error(res.error.message)
                     }
                 })
-            }
+            },
+          /*图片上传成功回调*/
+          /*主图回调*/
+            picUoloadHandler(res){
+                this.groupClassForm.mainImgUrl = res.data.url
+                this.$refs['mainPic'].src=imgBaseUrl+res.data.url
+            },
+          /*轮播回调*/
+            scrollOneHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[0] = data
+                this.$refs['scrollOne'].src=imgBaseUrl+res.data.url
+            },
+            scrollTwoHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[1] = data
+                this.$refs['scrollTwo'].src=imgBaseUrl+res.data.url
+            },
+            scrollThreeHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[2] = data
+                this.$refs['scrollThree'].src=imgBaseUrl+res.data.url
+            },
         },
         computed:{
             groupClassColumn(){
@@ -375,6 +456,7 @@
             }
         },
         created:function () {
+            this.uploadUrl = this.$http.defaults.baseURL+'/img/upload'
             this.init()
         }
     }

@@ -1,32 +1,34 @@
 <style scoped rel="stylesheet/scss" lang="scss">
-    .img_header {
-        width: 100%;
-        height: 56px;
-        line-height: 56px;
-        .img_title {
-            float: left;
-            font-size: 20px;
-            padding-left: 34px;
+    .content{
+        .img_header {
+            width: 100%;
+            height: 56px;
+            line-height: 56px;
+            .img_title {
+                float: left;
+                font-size: 20px;
+                padding-left: 34px;
+            }
         }
-    }
-    .img_page{
-        line-height: 60px;
-    }
-    /*图片模态*/
-    .displayImg{
-        width: 300px;
-        height: 300px;
-        object-fit: cover;
-    }
-    .picAdress{
-        display: inline-block;
-        width:100%;
-        padding: 20px;
-        text-align: center;
+        .img_page{
+            line-height: 60px;
+        }
+        /*图片模态*/
+        .displayImg{
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+        }
+        .picAdress{
+            display: inline-block;
+            width:100%;
+            padding: 20px;
+            text-align: center;
+        }
     }
 </style>
 <template>
-    <div>
+    <div class="content">
         <div class="img_header">
             <div class="img_title">
                 图片
@@ -43,8 +45,7 @@
                   @on-change="pageChangeHandler($event)"></Page>
         </div>
         <!--创建餐饮信息-->
-        <Modal :title="detailTitle" v-model="imgAddModal">
-            <Form ref="imgForm" :model="imgForm" :rules="ruleValidate" :label-width="80">
+        <Modal :title="detailTitle" v-model="imgAddModal" :mask-closable="false">
                 <Row v-if="picFlg">
                     <Col span="24">
                     <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
@@ -78,13 +79,10 @@
                 imgForm: {
                     url: ''
                 },
-                /*图片上传地址*/
+                /*图片上传接口地址*/
                 uploadUrl:'',
                 /*图片显示标志*/
                 picFlg:true,
-                ruleValidate: {
-                    url: [{required: true, message: '请填写图片地址', trigger: 'blur'}]
-                },
                 page: {
                     pageNo: 1,
                     pageSize: 10,

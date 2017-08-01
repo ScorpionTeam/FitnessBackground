@@ -31,7 +31,7 @@
             @on-change="pageChangeHandler($event)"></Page>
     </div>
     <!--创建教练信息-->
-    <Modal :title="detailTitle" v-model="coachAddModal">
+    <Modal :title="detailTitle" v-model="coachAddModal" :mask-closable="false">
       <Form ref="coachForm" :model="coachForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="12">

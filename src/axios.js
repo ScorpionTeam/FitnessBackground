@@ -23,7 +23,7 @@ axios.interceptors.request.use(
   config => {
     
     //判断本地授权信息  oath
-    var oauth = localStorage.getItem('oauth');
+    let oauth = localStorage.getItem('oauth');
     if (oauth) {
       config.headers.oauth = oauth;
     }

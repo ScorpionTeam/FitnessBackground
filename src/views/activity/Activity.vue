@@ -33,7 +33,7 @@
     <div class="page">
       <Page   :page-size="page.pageSize" :total="page.total" :current="page.pageNo" @on-change="pageChange"></Page>
     </div>
-    <Modal title="活动详情" v-model="modalFlag" :width="800">
+    <Modal title="活动详情" v-model="modalFlag" :width="800" :mask-closable="false">
       <Form ref="detail" :model="activityForm" label-position="right" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="8">

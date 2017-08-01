@@ -55,9 +55,9 @@
           </Col>
           <Col span="8">
           <Form-item label="场馆" prop="stadiumId">
-              <Select v-model="groupClassForm.stadiumId" placeholder="请选择场馆" @on-change="stadiumChangeHandler()">
-                <Option :value="item.id" :key="item.id" v-for="item in stadiumList">{{item.name}}</Option>
-              </Select>
+            <Select v-model="groupClassForm.stadiumId" placeholder="请选择场馆" @on-change="stadiumChangeHandler()">
+              <Option :value="item.id" :key="item.id" v-for="item in stadiumList">{{item.name}}</Option>
+            </Select>
           </Form-item>
           </Col>
           <Col span="8">
@@ -81,7 +81,7 @@
               -</Col>
               <Col span="11">
               <Form-item prop="endDate">
-                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.endDate"></Date-picker>
+                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.endDate" ></Date-picker>
               </Form-item>
               </Col>
             </Row>
@@ -94,6 +94,30 @@
           </Col>
         </Row>
       </Form>
+      <Row>
+        <Col span="12">
+        <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
+          <img src="" alt="主图" ref="mainPic" style="height: 160px;width: 160px;">
+        </Upload>
+        </Col>
+        <Col span="12">
+        <Upload :action="uploadUrl"  :on-success="scrollOneHandler" :show-upload-list="false" style="text-align: center">
+          <img src="" alt="轮播图" ref="scrollOne" style="height: 160px;width: 160px;">
+        </Upload>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="12">
+        <Upload :action="uploadUrl"  :on-success="scrollTwoHandler" :show-upload-list="false" style="text-align: center">
+          <img src="" alt="轮播图" ref="scrollTwo" style="height: 160px;width: 160px;">
+        </Upload>
+        </Col>
+        <Col span="12">
+        <Upload :action="uploadUrl"  :on-success="scrollThreeHandler" :show-upload-list="false" style="text-align: center">
+          <img src="" alt="轮播图" ref="scrollThree" style="height: 160px;width: 160px;">
+        </Upload>
+        </Col>
+      </Row>
       <div class="group_class_add_btn">
         <Button type="primary" @click="submit('groupClassForm')">保存</Button>
       </div>
@@ -101,6 +125,7 @@
   </div>
 </template>
 <script>
+    import {imgBaseUrl} from'../../common/WebApi'
     export default{
         data(){
             return {
@@ -112,7 +137,9 @@
                     stadiumId:'',
                     startDate:'',
                     endDate:'',
-                    address:''
+                    address:'',
+                    mainImgUrl:'',
+                    imgList:[]
                 },
                 ruleValidate: {
                     name:[{required:true,message:'请输入名称',trigger:'blur'}],
@@ -125,7 +152,9 @@
                     endDate:[{type:'date',required:true,message:'请选择结束日期',trigger:'change'}]
                 },
                 stadiumList:[],
-                coachList:[]
+                coachList:[],
+              /*图片上传地址*/
+                uploadUrl:''
             }
         },
         methods:{
@@ -145,16 +174,52 @@
             stadiumChangeHandler(){
                 this.coachListHandler()
             },
+          /*图片上传成功回调*/
+          /*主图回调*/
+            picUoloadHandler(res){
+                this.groupClassForm.mainImgUrl = res.data.url
+                this.$refs['mainPic'].src=imgBaseUrl+res.data.url
+            },
+          /*轮播回调*/
+            scrollOneHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[0] = data
+                this.$refs['scrollOne'].src=imgBaseUrl+res.data.url
+            },
+            scrollTwoHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[1] = data
+                this.$refs['scrollTwo'].src=imgBaseUrl+res.data.url
+            },
+            scrollThreeHandler(res){
+                let data = {}
+                data.url = res.data.url
+                this.groupClassForm.imgList[2] = data
+                this.$refs['scrollThree'].src=imgBaseUrl+res.data.url
+            },
             //提交按钮事件
             submit(){
                 let self = this;
                 console.log(this.groupClassForm)
                 self.$refs['groupClassForm'].validate(function (valid) {
+                  /*判断是否图片都上传了*/
+                    if(self.groupClassForm.mainImgUrl==''||self.groupClassForm.mainImgUrl==undefined||self.groupClassForm.imgList.length!=3){
+                        self.$Message.error('请上传图片')
+                        return
+                    }
                     if(valid){
                         self.$http.post('/groupClass/add',JSON.stringify(self.groupClassForm)).then(function (res) {
                             if(res.result==1){
                                 self.$Message.success('创建团课成功')
                                 self.$refs['groupClassForm'].resetFields();
+                                self.groupClassForm.mainImgUrl =''
+                                self.groupClassForm.imgList = []
+                                self.$refs['mainPic'].src=''
+                                self.$refs['scrollOne'].src=''
+                                self.$refs['scrollTwo'].src=''
+                                self.$refs['scrollThree'].src=''
                             }else{
                                 self.$Message.error('创建团课失败')
                             }
@@ -163,9 +228,10 @@
                         self.$Message.error('请将表单填写完整')
                     }
                 })
-            }
+            },
         },
         created(){
+            this.uploadUrl = this.$http.defaults.baseURL+'/img/upload'
             this.stadiumListHandler()
         }
     }

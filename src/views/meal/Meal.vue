@@ -31,7 +31,7 @@
             @on-change="pageChangeHandler($event)"></Page>
     </div>
     <!--创建餐饮信息-->
-    <Modal :title="detailTitle" v-model="mealAddModal">
+    <Modal :title="detailTitle" v-model="mealAddModal" :mask-closable="false">
       <Form ref="mealForm" :model="mealForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="12">

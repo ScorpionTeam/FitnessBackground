@@ -26,7 +26,7 @@
     <!--vip新增模态-->
     <Modal
             v-model="vipAddModal"
-            :title="detailTitle">
+            :title="detailTitle" :mask-closable="false">
       <Form ref="vipForm" :model="vipForm" :rules="vipValidate" :label-width="80">
         <Form-item label="场馆" prop="stadiumId">
           <Select v-model="vipForm.stadiumId" placeholder="请选择场馆">

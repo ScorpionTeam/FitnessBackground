@@ -33,7 +33,7 @@
             @on-change="pageChangeHandler($event)"></Page>
     </div>
     <!--修改模态-->
-    <Modal title="修改场馆" v-model="detailFlag" >
+    <Modal title="修改场馆" v-model="detailFlag" :mask-closable="false">
       <Form ref="stadiumForm" :model="stadiumForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="16">
@@ -82,7 +82,7 @@
       </div>
     </Modal>
     <!--Prompt提示框-->
-    <Modal v-model="open" width="360">
+    <Modal v-model="open" width="360" :mask-closable="false">
       <p slot="header" style="color:#f60;text-align:center">
         <Icon type="information-circled"></Icon>
         <span>删除确认</span>
