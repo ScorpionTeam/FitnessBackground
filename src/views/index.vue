@@ -23,7 +23,7 @@
     }
     .index_content {
       margin-left: 240px;
-      position: relative;
+      position: fixed;
       height: 100%;
       .contain {
         width: 100%;
