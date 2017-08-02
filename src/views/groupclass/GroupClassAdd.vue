@@ -69,25 +69,25 @@
           </Col>
         </Row>
         <Row>
-          <Col span="8">
+          <Col span="16">
           <Form-item label="选择日期">
             <Row>
               <Col span="11">
               <Form-item prop="startDate">
-                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.startDate"></Date-picker>
+                <Date-picker type="datetime" placeholder="选择日期" v-model="groupClassForm.startDate"></Date-picker>
               </Form-item>
               </Col>
               <Col span="2" style="text-align: center">
               -</Col>
               <Col span="11">
               <Form-item prop="endDate">
-                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.endDate" ></Date-picker>
+                <Date-picker type="datetime" placeholder="选择日期" v-model="groupClassForm.endDate" ></Date-picker>
               </Form-item>
               </Col>
             </Row>
           </Form-item>
           </Col>
-          <Col span="16">
+          <Col span="8">
           <Form-item label="上课地址" prop="address">
             <Input v-model="groupClassForm.address" placeholder="请输入上课地址"></Input>
           </Form-item>

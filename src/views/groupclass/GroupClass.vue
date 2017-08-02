@@ -52,7 +52,7 @@
     <div class="page">
       <Page   :page-size="page.pageSize" :total="page.total" :current="page.pageNo" @on-change="pageChange"></Page>
     </div>
-    <Modal title="团课详情" v-model="detailFlag" :width="1000" @on-ok="updateConfirm" :mask-closable="false">
+    <Modal title="团课详情" v-model="detailFlag" :width="1000"  :mask-closable="false">
       <Form ref="groupClassForm" :model="groupClassForm" :rules="ruleValidate" :label-width="80">
         <Row>
           <Col span="8">
@@ -93,25 +93,25 @@
           </Col>
         </Row>
         <Row>
-          <Col span="8">
+          <Col span="16">
           <Form-item label="选择日期">
             <Row>
               <Col span="11">
               <Form-item prop="startDate">
-                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.startDate"></Date-picker>
+                <Date-picker type="datetime" placeholder="选择日期" v-model="groupClassForm.startDate" style="width:100%"></Date-picker>
               </Form-item>
               </Col>
               <Col span="2" style="text-align: center">
               -</Col>
               <Col span="11">
               <Form-item prop="endDate">
-                <Date-picker type="date" placeholder="选择日期" v-model="groupClassForm.endDate"></Date-picker>
+                <Date-picker type="datetime" placeholder="选择日期" v-model="groupClassForm.endDate" style="width:100%"></Date-picker>
               </Form-item>
               </Col>
             </Row>
           </Form-item>
           </Col>
-          <Col span="16">
+          <Col span="8">
           <Form-item label="上课地址" prop="address">
             <Input v-model="groupClassForm.address" placeholder="请输入上课地址"></Input>
           </Form-item>
@@ -142,6 +142,11 @@
           </Col>
         </Row>
       </Form>
+      <div slot="footer">
+        <div style="text-align: center">
+          <Button type="primary" @click="updateConfirm">提交</Button>
+        </div>
+      </div>
     </Modal>
   </div>
 </template>
@@ -308,7 +313,7 @@
                                 self.$refs['groupClassForm'].resetFields();
                                 self.pageList()
                             }else{
-                                self.$Message.error('修改团课失败')
+                                self.$Message.error(res.error.message)
                             }
                         })
                     }else {
