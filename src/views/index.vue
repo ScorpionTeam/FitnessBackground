@@ -24,6 +24,7 @@
     .index_content {
       margin-left: 240px;
       position: fixed;
+      left: 17px;
       height: 100%;
       .contain {
         width: 100%;
