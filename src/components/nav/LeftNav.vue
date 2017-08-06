@@ -1,3 +1,11 @@
+<style rel="stylesheet/scss" lang="scss" >
+  .ivu-menu{
+    i{
+      width: 20px;
+      text-align: center;
+    }
+  }
+</style>
 <template>
   <div>
     <Menu :theme="theme3" active-name="member" @on-select="click">

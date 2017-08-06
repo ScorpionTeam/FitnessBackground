@@ -15,17 +15,14 @@
     height: 100%;
     padding-top: 60px;
     .index_menu {
-      /*position: fixed;*/
-      /*height: 100%;*/
-      position: absolute;
-      height: 100%;
+      position: fixed;
+      height: calc(100% - 60px);
       overflow-y: scroll;
     }
     .index_content {
-      margin-left: 240px;
-      position: fixed;
-      left: 17px;
-      height: 100%;
+      margin-left: 257px;
+      position:relative;
+      /*height: 100%;*/
       .contain {
         width: 100%;
       }
