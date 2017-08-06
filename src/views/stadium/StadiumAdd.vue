@@ -119,7 +119,8 @@
         },
         methods: {
             onEditorChange({editor, html, text}) {
-                console.log(html)
+                console.log(html);
+              console.log()
                 this.content = html
                 this.stadiumForm.content = html
             },
