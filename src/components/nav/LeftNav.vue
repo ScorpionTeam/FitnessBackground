@@ -37,9 +37,9 @@
         <Icon type="ios-game-controller-b" size="20"></Icon>
         活动
       </Menu-item>
-      <Menu-item name="news">
+      <Menu-item name="question">
         <Icon type="chatbubble-working" size="20"></Icon>
-        新闻
+        发言
       </Menu-item>
       <Menu-item name="meal">
         <Icon type="fork" size="20"></Icon>

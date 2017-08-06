@@ -13,7 +13,7 @@ import GroupClassAdd from '@/views/groupclass/GroupClassAdd.vue'
 import Coach from '@/views/coach/Coach.vue'
 import Activity from '@/views/activity/Activity.vue'
 import ActivityAdd from '@/views/activity/ActivityAdd.vue'
-import News from '@/views/news/News.vue'
+import Question from '@/views/Question/Question.vue'
 import StatisticsMain from '@/views/statistics/StatisticsMain.vue'
 import Impression from '@/views/impression/Impression.vue'
 import Meal from '@/views/meal/Meal.vue'
@@ -114,12 +114,12 @@ export default new Router({
           component: ActivityAdd
         }
         , {
-          path: '/news',
-          name: 'news',
+          path: '/Question',
+          name: 'question',
           meta: {
             title: '发言'
           },
-          component: News
+          component: Question
         }, {
           path: '/statistics',
           name: 'statistics',
