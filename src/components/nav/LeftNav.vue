@@ -45,6 +45,10 @@
         <Icon type="fork" size="20"></Icon>
         餐饮
       </Menu-item>
+      <Menu-item name="drink">
+        <Icon type="coffee" size="20"></Icon>
+        水吧
+      </Menu-item>
       <Menu-item name="impression">
         <Icon type="star" size="20"></Icon>
         印象

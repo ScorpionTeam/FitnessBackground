@@ -251,8 +251,14 @@
             },
           /*获取教练列表*/
             coachListHandler(){
-                this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(res=>{
-                    this.coachList=res.data
+                let self = this
+                this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(function(res){
+                    if(res.result==1){
+                        self.coachList=res.data
+                    }else {
+                        self.$Message.error(res.error.message)
+                    }
+
                 })
             },
             groupClassAddHandler(){
@@ -267,7 +273,7 @@
               /*初始化图片*/
                 this.groupClass(val.id)
             },
-            /*团课详情*/
+          /*团课详情*/
             groupClass(id){
                 let self = this
                 self.$http.get('/groupClass/classInfo?id='+id).then(function(res){

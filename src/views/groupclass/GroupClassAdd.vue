@@ -166,13 +166,15 @@
             },
             //根据场馆查询教练
             coachListHandler(){
-                this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(res=>{
-                    this.coachList=res.data
+                let self  = this;
+                this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(function(res){
+                    self.coachList=res.data
                 })
             },
             //选择场馆事件
             stadiumChangeHandler(){
-                this.coachListHandler()
+                let self= this;
+                self.coachListHandler()
             },
           /*图片上传成功回调*/
           /*主图回调*/

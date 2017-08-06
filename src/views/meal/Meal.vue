@@ -104,7 +104,7 @@
                 key: '',
                 action:'add',
               /*模态标题*/
-                detailTitle:'新增教练'
+                detailTitle:'新增营养餐'
 
             }
         },
@@ -174,7 +174,7 @@
                             self.pageListHandler()
                             self.mealAddModal =!self.mealAddModal
                         } else {
-                            self.$Message.error('修改营养餐失败')
+                            self.$Message.error(res.error.message)
                         }
                     })
                 }

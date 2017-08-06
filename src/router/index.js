@@ -17,6 +17,7 @@ import Question from '@/views/Question/Question.vue'
 import StatisticsMain from '@/views/statistics/StatisticsMain.vue'
 import Impression from '@/views/impression/Impression.vue'
 import Meal from '@/views/meal/Meal.vue'
+import Water from '@/views/water/Water.vue'
 import  Picture from '@/views/picture/Picture.vue'
 
 
@@ -141,7 +142,14 @@ export default new Router({
             title: '餐饮'
           },
           component: Meal
-        },{
+        }, {
+              path: '/drink',
+              name: 'drink',
+              meta: {
+                  title: '水吧'
+              },
+              component: Water
+          },{
               path: '/picture',
               name: 'picture',
               meta: {
