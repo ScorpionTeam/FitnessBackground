@@ -60,7 +60,7 @@
                     pageSize: 10,
                     total: 0
                 },
-                key: ' '
+                key: ''
 
             }
         },
@@ -82,6 +82,11 @@
             },
           /*打开模态*/
             openModalHandler(val){
+                console.log(val)
+                /*判断是否有答案返回，没有加一个字段*/
+                if(val.answer==undefined){
+                    val.answer = ''
+                }
                 this.questionForm = val;
                 this.questionModal = !this.questionModal
             },
@@ -96,6 +101,7 @@
                 this.$http.post('/qa/answer',JSON.stringify(this.questionForm)).then(function (res) {
                     if(res.result==1){
                         self.$Message.success('回答成功')
+                        self.pageListHandler()
                         self.questionModal = !self.questionModal
                     }else {
                         self.$Message.error(res.error.message)
@@ -118,7 +124,9 @@
                 this.$http.post('/qa/del?id='+id).then(function (res) {
                     if(res.result==1){
                         self.$Message.success('删除成功')
-                        self.pageListHandler()
+                        setTimeout(function () {
+                            self.pageListHandler()
+                        },1000)
                     }else {
                         self.$Message.error(res.error.message)
                     }
@@ -165,17 +173,34 @@
                     width:150
                 });
                 columns.push({
-                    title: '状态',
-                    key: 'status',
+                    title: '回答状态',
+                    key: 'answerStatus',
                     align: 'center',
                     width:120,
                     render:function (h,params) {
                         let text ='',color
-                        text = params.row.status=='1'?'已回答':'未回答'
-                        color=params.row.status=='1'?'green':''
+                        text = params.row.answerStatus=='1'?'已回答':'未回答'
+                        color=params.row.answerStatus=='1'?'green':''
                         return h('span',{
                             style:{
                                 color:color
+                            }
+                        },text)
+                    }
+                });
+                columns.push({
+                    title: '状态',
+                    key: 'answerStatus',
+                    align: 'center',
+                    width:120,
+                    render:function (h,params) {
+                        let text ='',color
+                        text = params.row.status=='1'?'正常':'删除'
+                        color=params.row.status=='1'?'green':'red'
+                        return h('Tag',{
+                            props:{
+                                color:color,
+                                type:'dot'
                             }
                         },text)
                     }
