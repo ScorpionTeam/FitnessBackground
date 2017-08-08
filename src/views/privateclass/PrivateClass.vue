@@ -74,15 +74,18 @@
           </Form-item>
           </Col>
           <Col span="16">
-            <Form-item label="时间段" prop="privateClassTimeList">
-              <Form ref='times' :model="privateClassForm.privateClassTimeList" :rules="ruleValidateTwo">
-                <Form-item prop="times">
-                  <Checkbox-group v-model="privateClassForm.privateClassTimeList.times">
-                    <Checkbox :label="time" v-for="(time,index) in timeList" :key="index">{{time}}</Checkbox>
-                  </Checkbox-group>
-                </Form-item>
-              </Form>
-            </Form-item>
+          <Form-item label="时间段" prop="timeList">
+            <Checkbox-group v-model="privateClassForm.timeList" @on-change="timeFormatter">
+              <Checkbox :label="time" v-for="(time,index) in timeList" :key="index">{{time}}</Checkbox>
+            </Checkbox-group>
+            <!--<Form ref='times' :model="privateClassForm.privateClassTimeList" :rules="ruleValidateTwo">
+              <Form-item prop="times">
+                <Checkbox-group v-model="privateClassForm.privateClassTimeList.times">
+                  <Checkbox :label="time" v-for="(time,index) in timeList" :key="index">{{time}}</Checkbox>
+                </Checkbox-group>
+              </Form-item>
+            </Form>-->
+          </Form-item>
           </Col>
         </Row>
         <Row>
@@ -143,31 +146,30 @@
                     name:'',
                     classTime:'',
                     coachId:'',
-                    privateClassTimeList:{
-                        times:[]
-                    },
+                    privateClassTimeList:[],
                     mainImgUrl:'',
-                    imgList:[]
+                    imgList:[],
+                    timeList:[]
                 },
                 ruleValidate: {
                     name:[{required:true,message:'请输入名称',trigger:'blur'}],
                     classTime:[{type:'number',required:true,message:'请输入时长',trigger:'blur'}],
                     stadiumId:[{type:'number',required:true,message:'请选择场馆',trigger:'change'}],
                     coachId:[{type:'number',required:true,message:'请选择教练',trigger:'change'}],
-                    privateClassTimeList:[{type:'object',required:true,message:'请选择时间段',trigger:'change'}]
+                    timeList:[{type:'array',required:true,message:'请选择时间段',trigger:'change'}]
                 },
                 ruleValidateTwo:{
                     times:[{type:'array',required:true,message:'请选择时间段',trigger:'change'}]
                 },
               /*图片上传地址*/
                 uploadUrl:'',
-                /*Modal标题*/
+              /*Modal标题*/
                 modalTitle:'新增私教',
-                /*时间段集合*/
+              /*时间段集合*/
                 timeList:['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'],
-                /*操作*/
+              /*操作*/
                 action:'',
-                /*全选标志*/
+              /*全选标志*/
                 allFlag:false
             }
         },
@@ -230,14 +232,14 @@
 
                 })
             },
-            /*新增*/
+          /*新增*/
             privateClassAddHandler(action){
                 this.detailFlag=!this.detailFlag
                 this.modalTitle ='新增私教'
-                /*数据初始化*/
+              /*数据初始化*/
                 this.$refs['privateClassForm'].resetFields();
-                this.$refs['times'].resetFields();
-                /*图片清空*/
+                this.privateClassForm.privateClassTimeList = []
+              /*图片清空*/
                 this.$refs['mainPic'].src=''
                 this.$refs['scrollOne'].src=''
                 this.$refs['scrollTwo'].src=''
@@ -249,6 +251,8 @@
                 this.action = action
                 this.detailFlag = !this.detailFlag;
                 this.privateClassForm = val
+                /*初始化表单里时间段*/
+                this.getTimeListModal(this.privateClassForm.privateClassTimeList)
               /*初始化图片*/
                 this.privateClass(val.id)
             },
@@ -272,7 +276,27 @@
                     }
                 })
             },
-          /*修改*/
+          /*修改时间段数据格式*/
+            timeFormatter(val){
+                let timeArray = []
+                for(let key in val){
+                    let data = {}
+                    key = Number(key)
+                    data.time = val[key]
+                    timeArray.push(data)
+                }
+                this.privateClassForm.privateClassTimeList  = timeArray
+                console.log(this.privateClassForm)
+            },
+            getTimeListModal(arr){
+                let arry = []
+                for(let key in arr){
+                    key = Number(key)
+                    arry.push(arr[key].time)
+                }
+                this.privateClassForm.timeList = arr
+            },
+          /*提交*/
             submitConfirm(){
                 let self = this
                 self.$Modal.confirm({
@@ -293,36 +317,29 @@
                         return
                     }
                     if(valid){
-                        /*判断时间段*/
-                        self.$refs['times'].validate(function (valid){
-                            if(valid){
-                              /*判断操作*/
-                              if(self.action='add'){
-                                  self.$http.post('/privateClass/add',JSON.stringify(self.privateClassForm)).then(function (res) {
-                                      if(res.result==1){
-                                          self.$Message.success('新增私课成功')
-                                          self.$refs['privateClassForm'].resetFields();
-                                          self.$refs['times'].resetFields();
-                                          self.pageList()
-                                      }else{
-                                          self.$Message.error(res.error.message)
-                                      }
-                                  })
-                              }else{
-                                  self.$http.post('/privateClass/update',JSON.stringify(self.privateClassForm)).then(function (res) {
-                                      if(res.result==1){
-                                          self.$Message.success('修改私课成功')
-                                          self.$refs['privateClassForm'].resetFields();
-                                          self.pageList()
-                                      }else{
-                                          self.$Message.error(res.error.message)
-                                      }
-                                  })
-                              }
-                            }else {
-                                self.$Message.error('请选择时间段')
-                            }
-                        })
+                      /*判断操作*/
+                        if(self.action='add'){
+                            self.$http.post('/privateClass/add',JSON.stringify(self.privateClassForm)).then(function (res) {
+                                if(res.result==1){
+                                    self.$Message.success('新增私课成功')
+                                    self.$refs['privateClassForm'].resetFields();
+                                  /*self.$refs['times'].resetFields();*/
+                                    self.pageList()
+                                }else{
+                                    self.$Message.error(res.error.message)
+                                }
+                            })
+                        }else{
+                            self.$http.post('/privateClass/update',JSON.stringify(self.privateClassForm)).then(function (res) {
+                                if(res.result==1){
+                                    self.$Message.success('修改私课成功')
+                                    self.$refs['privateClassForm'].resetFields();
+                                    self.pageList()
+                                }else{
+                                    self.$Message.error(res.error.message)
+                                }
+                            })
+                        }
                     }else {
                         self.$Message.error('请将表单填写完整')
                     }
