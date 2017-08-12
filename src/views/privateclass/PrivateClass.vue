@@ -95,6 +95,13 @@
                     </Col>
                 </Row>
                 <Row>
+                    <Col span="8">
+                    <Form-item label="开始时间" prop="startDate">
+                        <Date-picker type="date" v-model="privateClassForm.startDate"  placeholder="选择日期" style="width: 100%"></Date-picker>
+                    </Form-item>
+                    </Col>
+                </Row>
+                <Row>
                     <Col span="12">
                     <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
                         <img src="" alt="主图" ref="mainPic" style="height: 160px;width: 160px;">
@@ -153,6 +160,7 @@
                     coachId:'',
                     privateClassTimeList:[],
                     mainImgUrl:'',
+                    startDate:'',
                     stadiumId:'',
                     imgList:[],
                     timeList:[]
@@ -162,7 +170,8 @@
                     classTime:[{type:'number',required:true,message:'请输入时长',trigger:'blur'}],
                     stadiumId:[{type:'number',required:true,message:'请选择场馆',trigger:'change'}],
                     coachId:[{type:'number',required:true,message:'请选择教练',trigger:'change'}],
-                    timeList:[{type:'array',required:true,message:'请选择时间段',trigger:'change'}]
+                    timeList:[{type:'array',required:true,message:'请选择时间段',trigger:'change'}],
+                    startDate:[{type:'date',required:true,message:'请选择开始时间',trigger:'change'}]
                 },
                 ruleValidateTwo:{
                     times:[{type:'array',required:true,message:'请选择时间段',trigger:'change'}]
