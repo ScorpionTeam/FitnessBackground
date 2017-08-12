@@ -12,6 +12,12 @@
   .coach_page{
     line-height: 60px;
   }
+  /*图片*/
+  img{
+    display: inline-block;
+    border: 1px solid #f1f1f1;
+    margin-bottom: 2rem;
+  }
 </style>
 <template>
   <div>
@@ -33,6 +39,9 @@
     <!--创建教练信息-->
     <Modal :title="detailTitle" v-model="coachAddModal" :mask-closable="false">
       <Form ref="coachForm" :model="coachForm" :rules="ruleValidate" :label-width="80">
+        <Upload :action="uploadUrl"  :on-success="picUoloadHandler" :show-upload-list="false" style="text-align: center">
+          <img src="" alt="头像" ref="headerPic" style="height: 160px;width: 160px;">
+        </Upload>
         <Row>
           <Col span="12">
           <Form-item label="姓名" prop="name">
@@ -90,6 +99,7 @@
   </div>
 </template>
 <script>
+  import {imgBaseUrl} from '../../common/WebApi'
     export default{
         data(){
             return {
@@ -99,6 +109,7 @@
                 coachForm: {
                     name: '',
                     phone: '',
+                    coachImgUrl:'',
                     organization: '',
                     validDate: '',
                     status: '1',
@@ -122,7 +133,9 @@
                 key: '',
                 action:'add',
               /*模态标题*/
-                detailTitle:'新增教练'
+                detailTitle:'新增教练',
+              /*图片上传地址*/
+                uploadUrl:''
 
             }
         },
@@ -144,6 +157,8 @@
                 if(action=='add'){
                     this.action = action
                     this.detailTitle = '新增教练'
+                    this.$refs['headerPic'].src=''
+                    this.coachForm.coachImgUrl=''
                   /*清空*/
                     this.$refs['coachForm'].resetFields()
                 }else {
@@ -152,6 +167,7 @@
                     let row = Object.assign({},val)
                     row.validDate = new Date(row.validDate)
                     this.coachForm = row
+                    this.$refs['headerPic'].src=imgBaseUrl+row.coachImgUrl
                 }
                 this.coachAddModal = !this.coachAddModal
             },
@@ -164,11 +180,17 @@
                 })
             },
             submitHandler(val){
-                this.$refs[val].validate((valid)=> {
+                let self=this
+                this.$refs[val].validate(function(valid) {
                     if (valid) {
-                        this.save()
+                        /*校验头像*/
+                        if(self.coachForm.coachImgUrl==''||self.coachForm.coachImgUrl==undefined){
+                            self.$Message.error('请选择头像照片')
+                            return
+                        }
+                        self.save()
                     } else {
-                        this.$Message.warning('数据校验失败')
+                        self.$Message.warning('数据校验失败')
                     }
                 })
             },
@@ -199,6 +221,11 @@
             pageChangeHandler(event){
                 this.page.pageNo=event
             },
+            /*头像上传回调*/
+            picUoloadHandler(res){
+                this.coachForm.coachImgUrl = res.data.url
+                this.$refs['headerPic'].src=imgBaseUrl+res.data.url
+            }
         },
         computed: {
             coachColumns(){
@@ -265,6 +292,7 @@
         created(){
             this.stadiumListHandler()
             this.pageListHandler()
+            this.uploadUrl = this.$http.defaults.baseURL+'/img/upload'
         }
     }
 </script>
