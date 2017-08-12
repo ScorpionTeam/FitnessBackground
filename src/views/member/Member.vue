@@ -17,6 +17,11 @@
     float: left;
     padding-left: 40px;
   }
+  img{
+    display: inline-block;
+    border: 1px solid #f1f1f1;
+    margin-bottom: 2rem;
+  }
 </style>
 <template>
   <div>

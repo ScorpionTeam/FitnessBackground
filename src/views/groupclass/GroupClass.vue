@@ -258,6 +258,9 @@
           /*获取教练列表*/
             coachListHandler(){
                 let self = this
+                if(this.groupClassForm.stadiumId==''||this.groupClassForm.stadiumId==undefined){
+                    return
+                }
                 this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.groupClassForm.stadiumId).then(function(res){
                     if(res.result==1){
                         self.coachList=res.data
@@ -314,6 +317,7 @@
                 let self = this;
                 self.$refs['groupClassForm'].validate(function (valid) {
                   /*判断是否图片都上传了*/
+                  console.log(self.groupClassForm)
                     if(self.groupClassForm.mainImgUrl==''||self.groupClassForm.mainImgUrl==undefined||self.groupClassForm.imgList.length!=3){
                         self.$Message.error('请上传图片')
                         return

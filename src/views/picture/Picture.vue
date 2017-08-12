@@ -26,6 +26,11 @@
             text-align: center;
         }
     }
+    img{
+        display: inline-block;
+        border: 1px solid #f1f1f1;
+        margin-bottom: 2rem;
+    }
 </style>
 <template>
     <div class="content">
@@ -110,6 +115,7 @@
             },
             /*打开模态*/
             openModalHandler(action,val){
+                this.imgAddModal = !this.imgAddModal
                 if(action=='add'){
                     this.picFlg = true
                     this.action = action
@@ -127,7 +133,6 @@
                         this.$refs['picDetail'].src=row.url
                     })
                 }
-                this.imgAddModal = !this.imgAddModal
             },
             pageChangeHandler(event){
                 this.page.pageNo=event

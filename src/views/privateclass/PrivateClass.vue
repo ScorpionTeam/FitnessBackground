@@ -144,7 +144,6 @@
                 detailFlag:false,
                 /*场馆*/
                 stadiumList:[],
-                stadiumId:'',
                 /*时间*/
                 date:'',
                 /*修改模态对象*/
@@ -154,6 +153,7 @@
                     coachId:'',
                     privateClassTimeList:[],
                     mainImgUrl:'',
+                    stadiumId:'',
                     imgList:[],
                     timeList:[]
                 },
@@ -188,7 +188,6 @@
                 let self = this;
                 this.$http.get('/stadium/allStadium').then(res=>{
                     self.stadiumList=res.data
-                    self.stadiumId = res.data[0].id
                     self.pageList()
                 })
             },
@@ -228,6 +227,9 @@
             /*获取教练列表*/
             coachListHandler(){
                 let self = this
+                if(this.privateClassForm.stadiumId==''||this.privateClassForm.stadiumId==undefined){
+                    return
+                }
                 this.$http.get('/coach/coachListByStadiumId?stadiumId='+this.privateClassForm.stadiumId).then(function(res){
                     if(res.result==1){
                         self.coachList=res.data
@@ -245,6 +247,7 @@
                 /*数据初始化*/
                 this.$refs['privateClassForm'].resetFields();
                 this.privateClassForm.privateClassTimeList = []
+                this.resetPicInfor()
                 /*图片清空*/
                 this.$refs['mainPic'].src=''
                 this.$refs['scrollOne'].src=''
@@ -288,7 +291,7 @@
                 for(let key in val){
                     let data = {}
                     key = Number(key)
-                    data.time = val[key]
+                    data.times = val[key]
                     timeArray.push(data)
                 }
                 this.privateClassForm.privateClassTimeList  = timeArray
@@ -298,7 +301,7 @@
                 let arry = []
                 for(let key in arr){
                     key = Number(key)
-                    arry.push(arr[key].time)
+                    arry.push(arr[key].times)
                 }
                 this.privateClassForm.timeList = arr
             },
@@ -328,8 +331,9 @@
                             self.$http.post('/privateClass/add',JSON.stringify(self.privateClassForm)).then(function (res) {
                                 if(res.result==1){
                                     self.$Message.success('新增私课成功')
+                                    self.detailFlag = !self.detailFlag
                                     self.$refs['privateClassForm'].resetFields();
-                                    /*self.$refs['times'].resetFields();*/
+                                    self.resetPicInfor()
                                     self.pageList()
                                 }else{
                                     self.$Message.error(res.error.message)
@@ -339,7 +343,9 @@
                             self.$http.post('/privateClass/update',JSON.stringify(self.privateClassForm)).then(function (res) {
                                 if(res.result==1){
                                     self.$Message.success('修改私课成功')
+                                    self.detailFlag = !self.detailFlag
                                     self.$refs['privateClassForm'].resetFields();
+                                    self.resetPicInfor()
                                     self.pageList()
                                 }else{
                                     self.$Message.error(res.error.message)
@@ -373,6 +379,11 @@
                         self.$Message.error(res.error.message)
                     }
                 })
+            },
+            /*情况图片字段信息*/
+            resetPicInfor(){
+                this.privateClassForm.mainImgUrl = ''
+                this.privateClassForm.imgList =[]
             },
             /*图片上传成功回调*/
             /*主图回调*/
