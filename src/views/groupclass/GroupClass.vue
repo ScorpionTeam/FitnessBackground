@@ -21,6 +21,12 @@
     padding-left: 34px;
     margin-top: 20px;
   }
+  /*图片样式*/
+  img{
+    display: inline-block;
+    border: solid 1px #f1f1f1;
+    margin-bottom: 2rem;
+  }
 </style>
 <template>
   <div>
@@ -316,6 +322,7 @@
                         self.$http.post('/groupClass/update',JSON.stringify(self.groupClassForm)).then(function (res) {
                             if(res.result==1){
                                 self.$Message.success('修改团课成功')
+                                self.detailFlag = !self.detailFlag
                                 self.$refs['groupClassForm'].resetFields();
                                 self.pageList()
                             }else{

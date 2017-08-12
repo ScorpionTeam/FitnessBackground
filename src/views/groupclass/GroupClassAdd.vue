@@ -20,6 +20,11 @@
     padding-left: 20%;
     padding-top: 20px;
   }
+  img{
+    display: inline-block;
+    border: solid 1px #f1f1f1;
+    margin-bottom: 2rem;
+  }
 </style>
 <template>
   <div>
