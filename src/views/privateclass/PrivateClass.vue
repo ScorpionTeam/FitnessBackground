@@ -203,7 +203,7 @@
             /*分页*/
             pageList(){
                 let self = this;
-                let url ='/privateClass/list?pageNo='+this.page.pageNo+'&pageSize='+this.page.pageSize+
+                let url ='/privateClass/bcList?pageNo='+this.page.pageNo+'&pageSize='+this.page.pageSize+
                     '&key='+this.key
                 self.$http.get(url).then(function (res) {
                     if(res.result==1){
@@ -443,20 +443,8 @@
                     align:'center'
                 })
                 columns.push({
-                    title:'总人数',
-                    key:'total',
-                    width:100,
-                    align:'center'
-                })
-                columns.push({
-                    title:'剩余人数',
-                    key:'surplusNum',
-                    width:100,
-                    align:'center'
-                })
-                columns.push({
                     title:'时长',
-                    key:'timeTotal',
+                    key:'classTime',
                     width:100,
                     align:'center'
                 })
@@ -467,17 +455,11 @@
                     align:'center'
                 })
                 columns.push({
-                    title:'结束时间',
-                    key:'endDate',
-                    width:150,
-                    align:'center'
-                })
-                columns.push({
                     title:'操作管理',
                     key:'name',
                     align:'center',
                     render:function (h,params) {
-                        return h('Buttonprivate',[
+                        return h('ButtonGroup',[
                             h('Button',{
                                 props:{
                                     type:'primary',
