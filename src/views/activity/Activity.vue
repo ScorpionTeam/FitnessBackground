@@ -230,7 +230,7 @@
                                 self.$Message.success('修改成功')
                                 self.$refs['detail'].resetFields();
                                 self.pageList()
-                                this.modalFlag = !this.modalFlag
+                                self.modalFlag = !self.modalFlag
                             }else {
                                 self.$Message.error(res.error.message)
                             }
