@@ -428,6 +428,23 @@
                     align:'center'
                 })
                 columns.push({
+                    title:'状态',
+                    key:'status',
+                    width:130,
+                    align:'center',
+                    render(h,params){
+                        let color ,text;
+                        text=params.row.status=='1'?'正常':'删除'
+                        color=params.row.status=='1'?'green':'red'
+                        return h('Tag',{
+                            props:{
+                                type:'dot',
+                                color:color
+                            }
+                        },text)
+                    }
+                })
+                columns.push({
                     title:'开课时间',
                     key:'startDate',
                     width:150,
