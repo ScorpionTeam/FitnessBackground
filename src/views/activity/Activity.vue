@@ -105,10 +105,9 @@
           <Col span="15" offset="1">
           <!--富文本编辑-->
           <Form-item prop="content" :label-width="1">
-            <quill-editor :content="activityForm.content"
-                          :options="editorOption"
-                          @change="onEditorChange($event)">
-            </quill-editor>
+            <vue-html5-editor :content="activityForm.content" :height="300"
+                              :z-index="2" @change="onEditorChange">
+            </vue-html5-editor>
           </Form-item>
           </Col>
         </Row>
@@ -249,8 +248,8 @@
               this.modalFlag = !this.modalFlag
           },
             //富文本改变事件
-            onEditorChange({editor, html, text}){
-                this.activityForm.content=text
+            onEditorChange(html){
+                this.activityForm.content=''
                 this.activityForm.contentHtml=html
             },
             //查询场馆列表

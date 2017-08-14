@@ -19,6 +19,7 @@ import Impression from '@/views/impression/Impression.vue'
 import Meal from '@/views/meal/Meal.vue'
 import Water from '@/views/water/Water.vue'
 import  Picture from '@/views/picture/Picture.vue'
+import Notice from '../views/notice/Notice.vue'
 
 
 Vue.use(Router)
@@ -149,6 +150,13 @@ export default new Router({
                   title: '水吧'
               },
               component: Water
+          },{
+              path: '/notice',
+              name: 'notice',
+              meta: {
+                  title: '消息'
+              },
+              component: Notice
           },{
               path: '/picture',
               name: 'picture',

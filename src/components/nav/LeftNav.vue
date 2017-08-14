@@ -61,6 +61,10 @@
         <Icon type="image" size="20"></Icon>
         图片
       </Menu-item>
+      <Menu-item name="notice">
+        <Icon type="image" size="20"></Icon>
+        消息
+      </Menu-item>
     </Menu>
   </div>
 
