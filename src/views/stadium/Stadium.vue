@@ -72,9 +72,9 @@
         </Row>
         <Form-item :label-width="1" prop="content">
           <!--富文本编辑-->
-          <quill-editor :content="stadiumForm.content"
-                        @change="onEditorChange($event)">
-          </quill-editor>
+          <vue-html5-editor :content="stadiumForm.content" :height="300"
+                            :z-index="2" @change="onEditorChange">
+          </vue-html5-editor>
         </Form-item>
       </Form>
       <div slot="footer">
@@ -207,7 +207,7 @@
                 this.stadiumForm = row;
             },
           /*富文本内容变化监听事件*/
-            onEditorChange({editor, html, text}) {
+            onEditorChange(html) {
                 console.log(html)
                 this.content = html
                 this.stadiumForm.content = html

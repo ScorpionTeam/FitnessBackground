@@ -79,10 +79,10 @@
             </Row>
             <Form-item :label-width="1" prop="content">
               <!--富文本编辑-->
-              <quill-editor :content="stadiumForm.content"
-                            :options="editorOption"
-                            @change="onEditorChange($event)">
-              </quill-editor>
+              <vue-html5-editor :content="stadiumForm.content" :height="300"
+                                :z-index="2" @change="onEditorChange">
+
+              </vue-html5-editor>
             </Form-item>
           </Form>
         </div>
@@ -118,9 +118,8 @@
             }
         },
         methods: {
-            onEditorChange({editor, html, text}) {
+            onEditorChange(html) {
                 console.log(html);
-              console.log()
                 this.content = html
                 this.stadiumForm.content = html
             },
@@ -131,7 +130,7 @@
                     if (valid) {
                         self.save()
                     } else {
-                        this.$Message.error('表单验证失败')
+                        self.$Message.error('表单验证失败')
                     }
                 })
             },
